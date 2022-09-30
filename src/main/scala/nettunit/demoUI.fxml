@@ -9,7 +9,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="577.0" prefWidth="754.0" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/18">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="577.0" prefWidth="754.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nettunit.UIController">
     <tabs>
         <Tab text="Apply emergency plan">
             <content>
@@ -18,10 +18,10 @@
                         <Label layoutX="14.0" layoutY="26.0" text="Emergency ID" />
                         <Label layoutX="14.0" layoutY="62.0" text="Operator" />
                         <Label layoutX="19.0" layoutY="90.0" text="Emergency type" />
-                        <TextField layoutX="117.0" layoutY="22.0" />
-                        <TextField layoutX="117.0" layoutY="57.0" />
-                        <TextField layoutX="117.0" layoutY="85.0" />
-                        <Button layoutX="222.0" layoutY="122.0" mnemonicParsing="false" text="Apply" />
+                        <TextField fx:id="planIDField" layoutX="117.0" layoutY="22.0" />
+                        <TextField fx:id="operatorNameField" layoutX="117.0" layoutY="57.0" />
+                        <TextField fx:id="emergencyTypeField" layoutX="117.0" layoutY="85.0" />
+                        <Button fx:id="applyIncidentButton" layoutX="222.0" layoutY="122.0" mnemonicParsing="false" onAction="#applyEmergencyPlan" text="Apply" />
                     </children></AnchorPane>
             </content>
         </Tab>
@@ -30,27 +30,27 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <children>
                         <Label layoutX="14.0" layoutY="39.0" text="Active Emergency plans" />
-                        <ListView layoutX="183.0" layoutY="25.0" prefHeight="92.0" prefWidth="409.0" />
+                        <ListView fx:id="activePlansListQuery" layoutX="183.0" layoutY="25.0" prefHeight="92.0" prefWidth="409.0" />
                         <Label layoutX="14.0" layoutY="135.0" text="Available tasks" />
-                        <ListView layoutX="183.0" layoutY="128.0" prefHeight="92.0" prefWidth="409.0" />
+                        <ListView fx:id="activeTasksListQuery" layoutX="183.0" layoutY="128.0" prefHeight="92.0" prefWidth="409.0" />
                         <Label layoutX="20.0" layoutY="256.0" text="Process status" />
                         <ImageView fitHeight="240.0" fitWidth="698.0" layoutX="20.0" layoutY="279.0" pickOnBounds="true" preserveRatio="true" />
-                        <Button layoutX="534.0" layoutY="230.0" mnemonicParsing="false" text="Update" />
+                        <Button fx:id="updateViewQueryButton" layoutX="534.0" layoutY="230.0" mnemonicParsing="false" onAction="#updateProcessQueryView" text="Update" />
                     </children>
                 </AnchorPane>
             </content>
         </Tab>
-        <Tab text="Simulated tasks">
+        <Tab fx:id="activePlansListSimulate" text="Simulated tasks">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <children>
                         <Label layoutX="41.0" layoutY="39.0" text="Active Emergency plans" />
                         <ListView layoutX="222.0" layoutY="39.0" prefHeight="92.0" prefWidth="409.0" />
                         <Label layoutX="41.0" layoutY="142.0" text="Available tasks" />
-                        <ListView layoutX="222.0" layoutY="142.0" prefHeight="92.0" prefWidth="409.0" />
-                        <Button layoutX="458.0" layoutY="260.0" mnemonicParsing="false" text="Complete Task" />
-                        <Button layoutX="566.0" layoutY="260.0" mnemonicParsing="false" text="Fail Task" />
-                        <Button layoutX="369.0" layoutY="260.0" mnemonicParsing="false" text="Update" />
+                        <ListView fx:id="activeTasksListSimulate" layoutX="222.0" layoutY="142.0" prefHeight="92.0" prefWidth="409.0" />
+                        <Button fx:id="completeTaskButton" layoutX="458.0" layoutY="260.0" mnemonicParsing="false" onAction="#completeTask" text="Complete Task" />
+                        <Button fx:id="failTaskButton" layoutX="566.0" layoutY="260.0" mnemonicParsing="false" onAction="#failTask" text="Fail Task" />
+                        <Button fx:id="updateSimulateViewButton" layoutX="369.0" layoutY="260.0" mnemonicParsing="false" onAction="#updateSimulatedTaskView" text="Update" />
                     </children>
                 </AnchorPane>
             </content>
