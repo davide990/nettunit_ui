@@ -12,7 +12,10 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", 
 Compile / resourceDirectory := (Compile / scalaSource).value
 libraryDependencies ++= Seq(
   "org.scalafx" %% "scalafx" % "18.0.1-R28",
-  "org.scalafx" %% "scalafxml-core-sfx8" % "0.5"
+  "org.scalafx" %% "scalafxml-core-sfx8" % "0.5",
+  // https://mvnrepository.com/artifact/org.scalaj/scalaj-http
+  "org.scalaj" %% "scalaj-http" % "2.4.2"
+
 )
 
 resolvers ++= Opts.resolver.sonatypeOssSnapshots
