@@ -10,35 +10,32 @@ import scalaj.http.{Http, HttpRequest}
 import java.net.ConnectException
 
 @sfxml
-class UIController(private val flowableAddressTextField: TextField,
-                   private val flowablePortTextField: TextField,
+class UIController(private val MUSAAddressTextField: TextField,
+                   private val MUSAPortTextField: TextField,
                    private val deployToFlowableButton: Button,
                    private val convertGoalSPECButton: Button,
                    private val GoalSPECTextArea: TextArea,
                    private val BPMNTextArea: TextArea,
-                   private val activePlansListQuery: ListView[String],
-                   private val activePlansListSimulate: ListView[String],
-                   private val activeTasksListQuery: ListView[String],
-                   private val activeTasksListSimulate: ListView[String],
+                   private val activePlansList: ListView[String],
+                   private val activeTasksList: ListView[String],
                    private val applyIncidentButton: Button,
                    private val completeTaskButton: Button,
                    private val emergencyTypeField: TextField,
                    private val failTaskButton: Button,
                    private val operatorNameField: TextField,
-                   private val nettunitAddressTextField: TextField,
-                   private val nettunitPortTextField: TextField,
+                   private val flowableAddressTextField: TextField,
+                   private val flowablePortTextField: TextField,
                    private val planIDField: TextField,
-                   private val updateSimulateViewButton: Button,
                    private val updateViewQueryButton: Button) {
 
   @FXML private[nettunit] def applyEmergencyPlan(event: ActionEvent): Unit = {
-    val address = nettunitAddressTextField.getText match {
-      case ad if ad.isEmpty => nettunitAddressTextField.getPromptText
-      case _ => nettunitAddressTextField.getText
+    val address = flowableAddressTextField.getText match {
+      case ad if ad.isEmpty => flowableAddressTextField.getPromptText
+      case _ => flowableAddressTextField.getText
     }
-    val port = nettunitPortTextField.getText match {
-      case ad if ad.isEmpty => nettunitPortTextField.getPromptText
-      case _ => nettunitPortTextField.getText
+    val port = flowablePortTextField.getText match {
+      case ad if ad.isEmpty => flowablePortTextField.getPromptText
+      case _ => flowablePortTextField.getText
     }
     val body = s"{\n  \"emergencyPlanID\":\"${planIDField.getText}\",\n  \"empName\":\"${operatorNameField.getText}\",\n  \"requestDescription\":\"${emergencyTypeField.getText}\"\n}"
 
@@ -56,13 +53,13 @@ class UIController(private val flowableAddressTextField: TextField,
 
   @FXML private[nettunit] def onConvertGoalsToBPMN(event: ActionEvent): Unit = {
     val goals = new String(GoalSPECTextArea.getText.getBytes(), "UTF-8")
-    val address = flowableAddressTextField.getText match {
+    val address = MUSAAddressTextField.getText match {
       case ad if ad.isEmpty => "localhost"
-      case _ => flowableAddressTextField.getText
+      case _ => MUSAAddressTextField.getText
     }
-    val port = flowablePortTextField.getText match {
+    val port = MUSAPortTextField.getText match {
       case ad if ad.isEmpty => "8081"
-      case _ => flowablePortTextField.getText
+      case _ => MUSAPortTextField.getText
     }
 
     val resultApply = Http(s"http://${address}:${port}/Goal2BPMN")
@@ -74,13 +71,13 @@ class UIController(private val flowableAddressTextField: TextField,
   }
 
   @FXML private[nettunit] def onDeployProcessToFlowable(event: ActionEvent): Unit = {
-    val address = flowableAddressTextField.getText match {
+    val address = MUSAAddressTextField.getText match {
       case ad if ad.isEmpty => "localhost"
-      case _ => flowableAddressTextField.getText
+      case _ => MUSAAddressTextField.getText
     }
-    val port = flowablePortTextField.getText match {
+    val port = MUSAPortTextField.getText match {
       case ad if ad.isEmpty => "8081"
-      case _ => flowablePortTextField.getText
+      case _ => MUSAPortTextField.getText
     }
     val resultApply = Http(s"http://${address}:${port}/Deploy")
       .header("Content-Type", "text/xml")
