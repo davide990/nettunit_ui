@@ -4,11 +4,29 @@ import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.Alert.AlertType
-import scalafx.scene.control.{Alert, Button, ListView, TextArea, TextField}
+import scalafx.scene.control.{Alert, Button, ListCell, ListView, TextArea, TextField}
 import scalafxml.core.macros.sfxml
 import scalaj.http.{Http, HttpRequest}
 
 import java.net.ConnectException
+import javafx.util.Callback
+import net.liftweb.json.{DefaultFormats, parse}
+
+case class Person(firstName: String, lastName: String)
+
+case class TaskDetail(taskID: String, taskName: String, processID: String, taskData: Map[String, Object])
+
+class PersonCellFactory extends Callback[ListView[Person], ListCell[Person]] {
+  override def call(listView: ListView[Person]): ListCell[Person] = new ListCell[Person]() {
+    def updateItem(person: Person, empty: Boolean): Unit = {
+      this.updateItem(person, empty)
+      if (empty || person == null) this.setText(null)
+      else this.setText(person.firstName + " " + person.lastName)
+    }
+
+
+  }
+}
 
 @sfxml
 class UIController(private val taskTypeListView: ListView[String],
@@ -40,8 +58,7 @@ class UIController(private val taskTypeListView: ListView[String],
   taskTypes += "prefect/declare_alarm_state"
   taskTypeListView.items = taskTypes
 
-  //var selectedTask = ""
-  //taskTypeListView.selectionModelProperty().addListener(x=>selectedTask=)
+  implicit val formats = DefaultFormats
 
   @FXML private[nettunit] def applyEmergencyPlan(event: ActionEvent): Unit = {
     val address = flowableAddressTextField.getText match {
@@ -141,7 +158,6 @@ class UIController(private val taskTypeListView: ListView[String],
       case ad if ad.isEmpty => flowablePortTextField.getPromptText
       case _ => flowablePortTextField.getText
     }
-    //val body = s"{\n  \"emergencyPlanID\":\"${planIDField.getText}\",\n  \"empName\":\"${operatorNameField.getText}\",\n  \"requestDescription\":\"${emergencyTypeField.getText}\"\n}"
 
     try {
       val resultApply = Http(s"http://${address}:${port}/NETTUNIT/incident_list/")
@@ -149,16 +165,19 @@ class UIController(private val taskTypeListView: ListView[String],
         .asString
       activePlansTextArea.setText(resultApply.body)
 
-      val resultApply2 = Http(s"http://${address}:${port}/NETTUNIT/task_list/${processIDTextField.getText}")
-        .method("GET")
-        .asString
-      activeTasksTextArea.setText(resultApply2.body)
+      if (!processIDTextField.getText.isEmpty) {
+        val resultApply2 = Http(s"http://${address}:${port}/NETTUNIT/task_list/${processIDTextField.getText}")
+          .method("GET")
+          .asString
+        activeTasksTextArea.setText(resultApply2.body)
+      }
 
     } catch {
       case _: ConnectException => new Alert(AlertType.Error, s"unable to connect. Please check if flowable is active").showAndWait()
     }
 
   }
+
 
 }
 

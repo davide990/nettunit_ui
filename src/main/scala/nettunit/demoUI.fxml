@@ -3,35 +3,39 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="654.0" prefWidth="754.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nettunit.UIController">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="566.0" prefWidth="691.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nettunit.UIController">
     <tabs>
       <Tab text="Process definition">
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <Label layoutX="14.0" layoutY="14.0" text="Write your GoalSPEC definition here" />
+                  <Label layoutX="14.0" layoutY="31.0" text="Write your GoalSPEC definition here" />
                   <TextArea fx:id="GoalSPECTextArea" layoutX="14.0" layoutY="52.0" prefHeight="426.0" prefWidth="282.0" promptText="Hello" text="GOAL Managing_emergency IS AND OF {&#10;&#10;GOAL send_team_to_evaluate : WHEN emergency_location(refinery) AND NOT assessed_emergency THEN THE safety_manager ROLE SHALL ADDRESS FINALLY alarm_state(attention)&#10;&#10;GOAL activate_internal_security_plan : WHEN alarm_state(attention) THEN THE plant_operator ROLE SHALL ADDRESS FINALLY internal_plan_active(active)&#10;&#10;GOAL notify_competent_body_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(prefect, attention) AND informed_authority(mayor, attention)&#10;&#10;GOAL inform_technical_rescue_organisation_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(commander_fire_brigade,attention)&#10;&#10;GOAL fire_brigade_assessment : WHEN informed(commander_fire_brigade, attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY fire_brigade_assessment_done(attention)&#10;&#10;GOAL prepare_tech_report : WHEN fire_brigade_assessment_done(attention) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY tech_report(fire,attention)&#10;&#10;GOAL coordinate_firefighter_intervention : WHEN tech_report(fire,attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY coordinated_firefighter_intervention AND second_explosion&#10;&#10;GOAL declare_pre_alert_state : WHEN coordinated_firefighter_intervention AND second_explosion THEN THE nettunit ROLE SHALL ADDRESS FINALLY alarm_state(pre_alert)&#10;&#10;GOAL inform_technical_rescue_organisation_alert : WHEN alarm_state(pre_alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(n118, pre_alert) AND informed(ASP, pre_alert) AND informed(ARPA, pre_alert)&#10;&#10;GOAL evaluate_fire_radiant_energy : WHEN informed(ARPA, pre_alert) AND alarm_state(pre_alert) THEN THE ARPA ROLE SHALL ADDRESS FINALLY evaluated_fire_radiant_energy&#10;&#10;GOAL declare_alarm_state : WHEN evaluated_fire_radiant_energy AND alarm_state(pre_alert) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY alarm_state(alert)&#10;&#10;GOAL ensure_presence_of_qualified_personnel : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(civil_protection,alert) AND informed_authority(municipality, alert)&#10;&#10;GOAL ensure_presence_of_representative : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(questor, alert)&#10;&#10;GOAL do_crossborder_communication : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY crossborder_inform&#10;}">
                      <font>
                         <Font name="Monaco" size="10.0" />
                      </font>
                   </TextArea>
-                  <TextArea fx:id="BPMNTextArea" layoutX="442.0" layoutY="31.0" prefHeight="356.0" prefWidth="282.0">
+                  <TextArea fx:id="BPMNTextArea" layoutX="377.0" layoutY="52.0" prefHeight="356.0" prefWidth="282.0">
                      <font>
                         <Font name="Courier New" size="12.0" />
                      </font>
                   </TextArea>
-                  <Label layoutX="442.0" layoutY="14.0" text="BPMN process definition" />
-                  <Button fx:id="convertGoalSPECButton" layoutX="305.0" layoutY="179.0" mnemonicParsing="false" onAction="#onConvertGoalsToBPMN" prefHeight="26.0" prefWidth="129.0" text="Convert to BPMN" />
-                  <Button fx:id="deployToFlowableButton" layoutX="442.0" layoutY="465.0" mnemonicParsing="false" onAction="#onDeployProcessToFlowable" prefHeight="26.0" prefWidth="282.0" text="Deploy Process to Flowable" />
-                  <TextField fx:id="MUSAAddressTextField" layoutX="442.0" layoutY="400.0" prefHeight="26.0" prefWidth="284.0" promptText="MUSA Address (default 'localhost')" />
-                  <TextField fx:id="MUSAPortTextField" layoutX="442.0" layoutY="432.0" prefHeight="26.0" prefWidth="282.0" promptText="MUSA Port (default 8081)" />
+                  <Label layoutX="377.0" layoutY="31.0" text="BPMN process definition" />
+                  <Button fx:id="convertGoalSPECButton" layoutX="305.0" layoutY="179.0" mnemonicParsing="false" onAction="#onConvertGoalsToBPMN" prefHeight="26.0" prefWidth="66.0" text="to BPMN" />
+                  <Button fx:id="deployToFlowableButton" layoutX="376.0" layoutY="481.0" mnemonicParsing="false" onAction="#onDeployProcessToFlowable" prefHeight="26.0" prefWidth="282.0" text="Deploy Process to Flowable" />
+                  <TextField fx:id="MUSAAddressTextField" layoutX="376.0" layoutY="416.0" prefHeight="26.0" prefWidth="284.0" promptText="MUSA Address (default 'localhost')" />
+                  <TextField fx:id="MUSAPortTextField" layoutX="376.0" layoutY="448.0" prefHeight="26.0" prefWidth="282.0" promptText="MUSA Port (default 8081)" />
                </children>
             </AnchorPane>
         </content>
@@ -40,17 +44,32 @@
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <children>
-                        <Label layoutX="28.0" layoutY="86.0" text="Emergency ID" />
-                        <Label layoutX="28.0" layoutY="122.0" text="Operator" />
-                        <Label layoutX="33.0" layoutY="150.0" text="Emergency type" />
-                        <TextField fx:id="planIDField" layoutX="131.0" layoutY="82.0" text="NETTUNITProcess" />
-                        <TextField fx:id="operatorNameField" layoutX="131.0" layoutY="117.0" />
-                        <TextField fx:id="emergencyTypeField" layoutX="131.0" layoutY="145.0" />
-                        <Button fx:id="applyIncidentButton" layoutX="131.0" layoutY="182.0" mnemonicParsing="false" onAction="#applyEmergencyPlan" prefHeight="26.0" prefWidth="154.0" text="New Emergency Plan" />
-                  <Label layoutX="28.0" layoutY="23.0" text="Flowable address" />
-                  <Label layoutX="28.0" layoutY="49.0" text="Flowable port" />
-                  <TextField fx:id="flowableAddressTextField" layoutX="149.0" layoutY="19.0" promptText="localhost" />
-                  <TextField fx:id="flowablePortTextField" layoutX="149.0" layoutY="45.0" promptText="8080" />
+                        <Button fx:id="applyIncidentButton" layoutX="205.0" layoutY="292.0" mnemonicParsing="false" onAction="#applyEmergencyPlan" prefHeight="40.0" prefWidth="171.0" text="New Emergency Plan" />
+                  <GridPane layoutX="38.0" layoutY="25.0" prefHeight="261.0" prefWidth="338.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="161.0" minWidth="10.0" prefWidth="103.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="235.0" minWidth="10.0" prefWidth="235.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="Flowable address" />
+                        <Label text="Flowable port" GridPane.rowIndex="1" />
+                        <TextField fx:id="flowableAddressTextField" promptText="localhost" GridPane.columnIndex="1" />
+                        <TextField fx:id="flowablePortTextField" promptText="8080" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="Emergency ID" GridPane.rowIndex="2" />
+                              <TextField fx:id="planIDField" text="NETTUNITProcess" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="Operator" GridPane.rowIndex="3" />
+                              <TextField fx:id="operatorNameField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <Label text="Emergency type" GridPane.rowIndex="4" />
+                              <TextField fx:id="emergencyTypeField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                     </children>
+                  </GridPane>
                     </children></AnchorPane>
             </content>
         </Tab>
@@ -58,19 +77,20 @@
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <children>
-                        <Label layoutX="14.0" layoutY="39.0" text="Active Emergency plans" />
-                        <Label layoutX="72.0" layoutY="209.0" text="Available tasks" />
-                        <Button fx:id="updateViewQueryButton" layoutX="505.0" layoutY="338.0" mnemonicParsing="false" onAction="#updateProcessQueryView" text="Update View" />
-                        <Button fx:id="completeTaskButton" layoutX="345.0" layoutY="573.0" mnemonicParsing="false" onAction="#completeTask" text="Complete Task" />
-                        <Button fx:id="failTaskButton" layoutX="236.0" layoutY="573.0" mnemonicParsing="false" onAction="#failTask" prefHeight="26.0" prefWidth="98.0" text="Fail Task" />
-                  <TextArea fx:id="activePlansTextArea" layoutX="176.0" layoutY="14.0" prefHeight="99.0" prefWidth="416.0" />
-                  <TextArea fx:id="activeTasksTextArea" layoutX="168.0" layoutY="209.0" prefHeight="112.0" prefWidth="416.0" />
-                  <TextField fx:id="processIDTextField" layoutX="170.0" layoutY="172.0" prefHeight="26.0" prefWidth="412.0" />
-                  <Label layoutX="72.0" layoutY="168.0" text="Process ID" />
-                  <TextField fx:id="taskIDTextField" layoutX="236.0" layoutY="540.0" prefHeight="26.0" prefWidth="350.0" promptText="something like ac1bff24-431a-11ed-b04d-76b363516a6f" />
-                  <Label layoutX="183.0" layoutY="545.0" text="Task ID" />
-                  <Label layoutX="177.0" layoutY="382.0" text="Task type" />
-                  <ListView fx:id="taskTypeListView" layoutX="236.0" layoutY="382.0" prefHeight="143.0" prefWidth="350.0" />
+                        <Label layoutX="64.0" layoutY="158.0" text="Available tasks" />
+                        <Button fx:id="updateViewQueryButton" layoutX="495.0" layoutY="277.0" mnemonicParsing="false" onAction="#updateProcessQueryView" text="Update View" />
+                        <Button fx:id="completeTaskButton" layoutX="377.0" layoutY="454.0" mnemonicParsing="false" onAction="#completeTask" text="Complete Task" />
+                        <Button fx:id="failTaskButton" layoutX="483.0" layoutY="454.0" mnemonicParsing="false" onAction="#failTask" prefHeight="26.0" prefWidth="98.0" text="Fail Task" />
+                  <TextArea fx:id="activeTasksTextArea" layoutX="153.0" layoutY="158.0" prefHeight="112.0" prefWidth="429.0" />
+                  <TextField fx:id="processIDTextField" layoutX="153.0" layoutY="119.0" prefHeight="26.0" prefWidth="430.0" />
+                  <Label layoutX="86.0" layoutY="124.0" text="Process ID" />
+                  <TextField fx:id="taskIDTextField" layoutX="153.0" layoutY="421.0" prefHeight="26.0" prefWidth="430.0" promptText="something like ac1bff24-431a-11ed-b04d-76b363516a6f" />
+                  <Label layoutX="105.0" layoutY="426.0" text="Task ID" />
+                  <Label layoutX="99.0" layoutY="319.0" text="Task type" />
+                  <ListView fx:id="taskTypeListView" layoutX="155.0" layoutY="319.0" prefHeight="91.0" prefWidth="426.0" />
+                        <Label layoutX="14.0" layoutY="14.0" text="Active Emergency plans" />
+                  <TextArea fx:id="activePlansTextArea" layoutX="153.0" layoutY="14.0" prefHeight="90.0" prefWidth="432.0" />
+                  <Separator layoutX="109.0" layoutY="303.0" prefHeight="16.0" prefWidth="473.0" />
                     </children>
                 </AnchorPane>
             </content>

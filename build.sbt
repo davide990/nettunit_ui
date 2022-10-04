@@ -14,8 +14,8 @@ libraryDependencies ++= Seq(
   "org.scalafx" %% "scalafx" % "18.0.1-R28",
   "org.scalafx" %% "scalafxml-core-sfx8" % "0.5",
   // https://mvnrepository.com/artifact/org.scalaj/scalaj-http
-  "org.scalaj" %% "scalaj-http" % "2.4.2"
-
+  "org.scalaj" %% "scalaj-http" % "2.4.2",
+  "net.liftweb" %% "lift-json" % "3.5.0"
 )
 
 resolvers ++= Opts.resolver.sonatypeOssSnapshots
