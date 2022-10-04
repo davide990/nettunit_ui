@@ -7,11 +7,10 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="577.0" prefWidth="754.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nettunit.UIController">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="654.0" prefWidth="754.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nettunit.UIController">
     <tabs>
       <Tab text="Process definition">
         <content>
@@ -60,14 +59,18 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <children>
                         <Label layoutX="14.0" layoutY="39.0" text="Active Emergency plans" />
-                        <ListView fx:id="activePlansList" layoutX="183.0" layoutY="25.0" prefHeight="92.0" prefWidth="409.0" />
-                        <Label layoutX="14.0" layoutY="135.0" text="Available tasks" />
-                        <ListView fx:id="activeTasksList" layoutX="183.0" layoutY="128.0" prefHeight="92.0" prefWidth="409.0" />
-                        <Label layoutX="20.0" layoutY="256.0" text="Process status" />
-                        <ImageView fitHeight="240.0" fitWidth="698.0" layoutX="20.0" layoutY="279.0" pickOnBounds="true" preserveRatio="true" />
-                        <Button fx:id="updateViewQueryButton" layoutX="534.0" layoutY="230.0" mnemonicParsing="false" onAction="#updateProcessQueryView" text="Update" />
-                        <Button fx:id="completeTaskButton" layoutX="413.0" layoutY="230.0" mnemonicParsing="false" onAction="#completeTask" text="Complete Task" />
-                        <Button fx:id="failTaskButton" layoutX="337.0" layoutY="230.0" mnemonicParsing="false" onAction="#failTask" text="Fail Task" />
+                        <Label layoutX="72.0" layoutY="209.0" text="Available tasks" />
+                        <Button fx:id="updateViewQueryButton" layoutX="505.0" layoutY="338.0" mnemonicParsing="false" onAction="#updateProcessQueryView" text="Update View" />
+                        <Button fx:id="completeTaskButton" layoutX="345.0" layoutY="573.0" mnemonicParsing="false" onAction="#completeTask" text="Complete Task" />
+                        <Button fx:id="failTaskButton" layoutX="236.0" layoutY="573.0" mnemonicParsing="false" onAction="#failTask" prefHeight="26.0" prefWidth="98.0" text="Fail Task" />
+                  <TextArea fx:id="activePlansTextArea" layoutX="176.0" layoutY="14.0" prefHeight="99.0" prefWidth="416.0" />
+                  <TextArea fx:id="activeTasksTextArea" layoutX="168.0" layoutY="209.0" prefHeight="112.0" prefWidth="416.0" />
+                  <TextField fx:id="processIDTextField" layoutX="170.0" layoutY="172.0" prefHeight="26.0" prefWidth="412.0" />
+                  <Label layoutX="72.0" layoutY="168.0" text="Process ID" />
+                  <TextField fx:id="taskIDTextField" layoutX="236.0" layoutY="540.0" prefHeight="26.0" prefWidth="350.0" promptText="something like ac1bff24-431a-11ed-b04d-76b363516a6f" />
+                  <Label layoutX="183.0" layoutY="545.0" text="Task ID" />
+                  <Label layoutX="177.0" layoutY="382.0" text="Task type" />
+                  <ListView fx:id="taskTypeListView" layoutX="236.0" layoutY="382.0" prefHeight="143.0" prefWidth="350.0" />
                     </children>
                 </AnchorPane>
             </content>
