@@ -2,34 +2,20 @@ package nettunit
 
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
+import net.liftweb.json.DefaultFormats
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.Alert.AlertType
-import scalafx.scene.control.{Alert, Button, ListCell, ListView, TextArea, TextField}
+import scalafx.scene.control._
+import scalafx.scene.image.{Image, ImageView}
 import scalafxml.core.macros.sfxml
-import scalaj.http.{Http, HttpRequest}
+import scalaj.http.Http
 
 import java.net.ConnectException
-import javafx.util.Callback
-import net.liftweb.json.{DefaultFormats, parse}
 
-case class Person(firstName: String, lastName: String)
-
-case class TaskDetail(taskID: String, taskName: String, processID: String, taskData: Map[String, Object])
-
-class PersonCellFactory extends Callback[ListView[Person], ListCell[Person]] {
-  override def call(listView: ListView[Person]): ListCell[Person] = new ListCell[Person]() {
-    def updateItem(person: Person, empty: Boolean): Unit = {
-      this.updateItem(person, empty)
-      if (empty || person == null) this.setText(null)
-      else this.setText(person.firstName + " " + person.lastName)
-    }
-
-
-  }
-}
 
 @sfxml
-class UIController(private val taskTypeListView: ListView[String],
+class UIController(private val planImageView: ImageView,
+                   private val taskTypeListView: ListView[String],
                    private val taskIDTextField: TextField,
                    private val processIDTextField: TextField,
                    private val MUSAAddressTextField: TextField,
@@ -52,13 +38,16 @@ class UIController(private val taskTypeListView: ListView[String],
 
   val taskTypes = ObservableBuffer("safety_manager/send_team_to_evaluate")
   taskTypes += "plant_operator/activate_internal_security_plan"
-  taskTypes += "commander_fire_brigade/fire_brigade_assessment"
+  taskTypes += "commander_fire_brigade/decide_response_type"
   taskTypes += "prefect/declare_pre_alert_state"
   taskTypes += "ARPA/evaluate_fire_radiant_energy"
   taskTypes += "prefect/declare_alarm_state"
   taskTypeListView.items = taskTypes
 
   implicit val formats = DefaultFormats
+
+  private def imageFromResource(name: String) =
+    new ImageView(new Image(getClass.getClassLoader.getResourceAsStream(name)))
 
   @FXML private[nettunit] def applyEmergencyPlan(event: ActionEvent): Unit = {
     val address = flowableAddressTextField.getText match {
@@ -69,10 +58,23 @@ class UIController(private val taskTypeListView: ListView[String],
       case ad if ad.isEmpty => flowablePortTextField.getPromptText
       case _ => flowablePortTextField.getText
     }
-    val body = s"{\n  \"emergencyPlanID\":\"${planIDField.getText}\",\n  \"empName\":\"${operatorNameField.getText}\",\n  \"requestDescription\":\"${emergencyTypeField.getText}\"\n}"
+
+
+
+    val body = s"{\n  \"emergencyPlanID\":\"${
+      planIDField.getText
+    }\",\n  \"empName\":\"${
+      operatorNameField.getText
+    }\",\n  \"requestDescription\":\"${
+      emergencyTypeField.getText
+    }\"\n}"
 
     try {
-      val resultApply = Http(s"http://${address}:${port}/NETTUNIT/incident/apply")
+      val resultApply = Http(s"http://${
+        address
+      }:${
+        port
+      }/NETTUNIT/incident/apply")
         .postData(body)
         .header("Content-Type", "application/json").asString
       new Alert(AlertType.Information, s"Success").showAndWait()
@@ -94,7 +96,11 @@ class UIController(private val taskTypeListView: ListView[String],
       case _ => MUSAPortTextField.getText
     }
 
-    val resultApply = Http(s"http://${address}:${port}/Goal2BPMN")
+    val resultApply = Http(s"http://${
+      address
+    }:${
+      port
+    }/Goal2BPMN")
       .header("Content-Type", "text/plain")
       .postData(goals)
       .asString
@@ -111,12 +117,18 @@ class UIController(private val taskTypeListView: ListView[String],
       case ad if ad.isEmpty => "8081"
       case _ => MUSAPortTextField.getText
     }
-    val resultApply = Http(s"http://${address}:${port}/Deploy")
+    val resultApply = Http(s"http://${
+      address
+    }:${
+      port
+    }/Deploy")
       .header("Content-Type", "text/xml")
       .postData(BPMNTextArea.getText)
       .asString
 
-    new Alert(AlertType.Information, s"Result: ${resultApply.statusLine}").showAndWait()
+    new Alert(AlertType.Information, s"Result: ${
+      resultApply.statusLine
+    }").showAndWait()
   }
 
   @FXML private[nettunit] def completeTask(event: ActionEvent): Unit = {
@@ -137,12 +149,22 @@ class UIController(private val taskTypeListView: ListView[String],
     val taskType = taskTypeListView.getSelectionModel.getSelectedItems.get(0)
     val taskID = taskIDTextField.getText
 
-    val requestString = s"http://${address}:${port}/NETTUNIT/${taskType}/${taskID}"
+    val requestString = s"http://${
+      address
+    }:${
+      port
+    }/NETTUNIT/${
+      taskType
+    }/${
+      taskID
+    }"
     val resultApply = Http(requestString)
       .postData("")
       .asString
 
-    new Alert(AlertType.Information, s"Result: ${resultApply.statusLine}").showAndWait()
+    new Alert(AlertType.Information, s"Result: ${
+      resultApply.statusLine
+    }").showAndWait()
   }
 
   @FXML private[nettunit] def failTask(event: ActionEvent): Unit = {
@@ -160,13 +182,23 @@ class UIController(private val taskTypeListView: ListView[String],
     }
 
     try {
-      val resultApply = Http(s"http://${address}:${port}/NETTUNIT/incident_list/")
+      val resultApply = Http(s"http://${
+        address
+      }:${
+        port
+      }/NETTUNIT/incident_list/")
         .method("GET")
         .asString
       activePlansTextArea.setText(resultApply.body)
 
       if (!processIDTextField.getText.isEmpty) {
-        val resultApply2 = Http(s"http://${address}:${port}/NETTUNIT/task_list/${processIDTextField.getText}")
+        val resultApply2 = Http(s"http://${
+          address
+        }:${
+          port
+        }/NETTUNIT/task_list/${
+          processIDTextField.getText
+        }")
           .method("GET")
           .asString
         activeTasksTextArea.setText(resultApply2.body)

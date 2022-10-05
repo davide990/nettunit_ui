@@ -15,10 +15,12 @@ libraryDependencies ++= Seq(
   "org.scalafx" %% "scalafxml-core-sfx8" % "0.5",
   // https://mvnrepository.com/artifact/org.scalaj/scalaj-http
   "org.scalaj" %% "scalaj-http" % "2.4.2",
-  "net.liftweb" %% "lift-json" % "3.5.0"
+  "net.liftweb" %% "lift-json" % "3.5.0",
+  "musajixelinterface" %% "musajixelinterface" % "0.1.0-SNAPSHOT"
 )
 
 resolvers ++= Opts.resolver.sonatypeOssSnapshots
+resolvers += Resolver.mavenLocal
 
 // Fork a new JVM for 'run' and 'test:run', to avoid JavaFX double initialization problems
 fork := true
