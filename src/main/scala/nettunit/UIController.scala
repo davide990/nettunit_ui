@@ -15,7 +15,7 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafxml.core.macros.sfxml
 import scalaj.http.Http
 
-import java.io.{FileInputStream, InputStream}
+import java.io.FileInputStream
 import java.net.ConnectException
 
 
@@ -64,8 +64,6 @@ class UIController(private val nettunitImageView: ImageView,
 
   nettunitImageView.setImage(new Image(new FileInputStream(getClass.getResource("/nettunit.png").getFile), 500, 50, false, true))
 
-  implicit val formats = DefaultFormats
-
   val login = ECOSUsers.davide_login
 
   private def imageFromResource(name: String) =
@@ -81,20 +79,10 @@ class UIController(private val nettunitImageView: ImageView,
       case _ => flowablePortTextField.getText
     }
 
-    val body = s"{\n  \"emergencyPlanID\":\"${
-      planIDField.getText
-    }\",\n  \"empName\":\"${
-      operatorNameField.getText
-    }\",\n  \"requestDescription\":\"${
-      emergencyTypeField.getText
-    }\"\n}"
+    val body = s"{\n  \"emergencyPlanID\":\"$planIDField.getText\",\n  \"empName\":\"$operatorNameField.getText\",\n  \"requestDescription\":\"$emergencyTypeField.getText\"\n}"
 
     try {
-      val resultApply = Http(s"http://${
-        address
-      }:${
-        port
-      }/NETTUNIT/incident/apply")
+      val resultApply = Http(s"http://$address:$port/NETTUNIT/incident/apply")
         .postData(body)
         .header("Content-Type", "application/json").asString
       new Alert(AlertType.Information, s"Success").showAndWait()
@@ -108,61 +96,22 @@ class UIController(private val nettunitImageView: ImageView,
 
   @FXML private[nettunit] def onConvertGoalsToBPMN(event: ActionEvent): Unit = {
     val goals = new String(GoalSPECTextArea.getText.getBytes(), "UTF-8")
-    val address = MUSAAddressTextField.getText match {
-      case ad if ad.isEmpty => "localhost"
-      case _ => MUSAAddressTextField.getText
-    }
-    val port = MUSAPortTextField.getText match {
-      case ad if ad.isEmpty => "8081"
-      case _ => MUSAPortTextField.getText
-    }
-
-    val resultApply = Http(s"http://${
-      address
-    }:${
-      port
-    }/Goal2BPMN")
+    val resultApply = Http(s"http://$getMUSAAddress():$getMUSAAddressPort()/Goal2BPMN")
       .header("Content-Type", "text/plain")
       .postData(goals)
       .asString
-
     BPMNTextArea.setText(resultApply.body)
   }
 
   @FXML private[nettunit] def onDeployProcessToFlowable(event: ActionEvent): Unit = {
-    val address = MUSAAddressTextField.getText match {
-      case ad if ad.isEmpty => "localhost"
-      case _ => MUSAAddressTextField.getText
-    }
-    val port = MUSAPortTextField.getText match {
-      case ad if ad.isEmpty => "8081"
-      case _ => MUSAPortTextField.getText
-    }
-    val resultApply = Http(s"http://${
-      address
-    }:${
-      port
-    }/Deploy")
+    val resultApply = Http(s"http://$getMUSAAddress():$getMUSAAddressPort()/Deploy")
       .header("Content-Type", "text/xml")
       .postData(BPMNTextArea.getText)
       .asString
-
-    new Alert(AlertType.Information, s"Result: ${
-      resultApply.statusLine
-    }").showAndWait()
-
+    new Alert(AlertType.Information, s"Result: $resultApply.statusLine").showAndWait()
   }
 
   @FXML private[nettunit] def completeTask(event: ActionEvent): Unit = {
-    val address = flowableAddressTextField.getText match {
-      case ad if ad.isEmpty => flowableAddressTextField.getPromptText
-      case _ => flowableAddressTextField.getText
-    }
-    val port = flowablePortTextField.getText match {
-      case ad if ad.isEmpty => flowablePortTextField.getPromptText
-      case _ => flowablePortTextField.getText
-    }
-
     if (taskTypeListView.getSelectionModel.getSelectedItems.isEmpty) {
       new Alert(AlertType.Information, "no task selected").showAndWait()
       return
@@ -170,20 +119,8 @@ class UIController(private val nettunitImageView: ImageView,
 
     val taskType = taskTypeListView.getSelectionModel.getSelectedItems.get(0)
     val taskID = taskIDTextField.getText
-
-    val requestString = s"http://${
-      address
-    }:${
-      port
-    }/NETTUNIT/${
-      taskType
-    }/${
-      taskID
-    }"
-    val resultApply = Http(requestString)
-      .postData("")
-      .asString
-
+    val requestString = s"http://$getFlowableAddress():$getFlowableAddressPort()/NETTUNIT/$taskType/$taskID"
+    val resultApply = Http(requestString).postData("").asString
     new Alert(AlertType.Information, s"Result: ${
       resultApply.statusLine
     }").showAndWait()
@@ -196,23 +133,8 @@ class UIController(private val nettunitImageView: ImageView,
   }
 
   @FXML private[nettunit] def updateProcessQueryView(event: ActionEvent): Unit = {
-    val address = flowableAddressTextField.getText match {
-      case ad if ad.isEmpty => flowableAddressTextField.getPromptText
-      case _ => flowableAddressTextField.getText
-    }
-    val port = flowablePortTextField.getText match {
-      case ad if ad.isEmpty => flowablePortTextField.getPromptText
-      case _ => flowablePortTextField.getText
-    }
-
     try {
-      val resultApply = Http(s"http://${
-        address
-      }:${
-        port
-      }/NETTUNIT/incident_list/")
-        .method("GET")
-        .asString
+      val resultApply = Http(s"http://$getFlowableAddress():$getFlowableAddressPort()/NETTUNIT/incident_list/").method("GET").asString
       activePlansTextArea.setText(resultApply.body)
 
       if (activePlansTextArea.getText == "[]") {
@@ -220,22 +142,32 @@ class UIController(private val nettunitImageView: ImageView,
       }
 
       if (!processIDTextField.getText.isEmpty) {
-        val resultApply2 = Http(s"http://${
-          address
-        }:${
-          port
-        }/NETTUNIT/task_list/${
-          processIDTextField.getText
-        }")
-          .method("GET")
-          .asString
+        val resultApply2 = Http(s"http://$getFlowableAddress():$getFlowableAddressPort()/NETTUNIT/task_list/${processIDTextField.getText}").method("GET").asString
         activeTasksTextArea.setText(resultApply2.body)
       }
-
     } catch {
       case _: ConnectException => new Alert(AlertType.Error, s"unable to connect. Please check if flowable is active").showAndWait()
     }
+  }
 
+  private def getFlowableAddress(): String = flowablePortTextField.getText match {
+    case ad if ad.isEmpty => flowablePortTextField.getPromptText
+    case _ => flowablePortTextField.getText
+  }
+
+  private def getFlowableAddressPort(): String = flowableAddressTextField.getText match {
+    case ad if ad.isEmpty => flowableAddressTextField.getPromptText
+    case _ => flowableAddressTextField.getText
+  }
+
+  private def getMUSAAddress(): String = MUSAAddressTextField.getText match {
+    case ad if ad.isEmpty => MUSAAddressTextField.getPromptText
+    case _ => MUSAAddressTextField.getText
+  }
+
+  private def getMUSAAddressPort(): String = MUSAPortTextField.getText match {
+    case ad if ad.isEmpty => MUSAPortTextField.getPromptText
+    case _ => MUSAPortTextField.getText
   }
 
   @FXML private[nettunit] def onSendJixelEventButtonClick(event: ActionEvent): Unit = {
@@ -247,17 +179,13 @@ class UIController(private val nettunitImageView: ImageView,
     processImageView.setImage(new Image(new FileInputStream(processsSendTeamIdle)))
   }
 
-  private def updateProcessImageView(): Unit = {
-    val taskType = taskTypeListView.getSelectionModel.getSelectedItems.get(0)
-
-    taskType match {
-      case "safety_manager/send_team_to_evaluate" => processImageView.setImage(new Image(new FileInputStream(processActivateInternalPlanIdle)))
-      case "plant_operator/activate_internal_security_plan" => processImageView.setImage(new Image(new FileInputStream(processDecideResponsePlanIdle)))
-      case "commander_fire_brigade/decide_response_type" => processImageView.setImage(new Image(new FileInputStream(processDeclarePreAlertIdle)))
-      case "prefect/declare_pre_alert_state" => processImageView.setImage(new Image(new FileInputStream(processEvaluateFireRadiantEnIdle)))
-      case "ARPA/evaluate_fire_radiant_energy" => processImageView.setImage(new Image(new FileInputStream(processDeclareAlarmIdle)))
-      case "prefect/declare_alarm_state" => processImageView.setImage(new Image(new FileInputStream(processComplete)))
-    }
+  private def updateProcessImageView() = taskTypeListView.getSelectionModel.getSelectedItems.get(0) match {
+    case "safety_manager/send_team_to_evaluate" => processImageView.setImage(new Image(new FileInputStream(processActivateInternalPlanIdle)))
+    case "plant_operator/activate_internal_security_plan" => processImageView.setImage(new Image(new FileInputStream(processDecideResponsePlanIdle)))
+    case "commander_fire_brigade/decide_response_type" => processImageView.setImage(new Image(new FileInputStream(processDeclarePreAlertIdle)))
+    case "prefect/declare_pre_alert_state" => processImageView.setImage(new Image(new FileInputStream(processEvaluateFireRadiantEnIdle)))
+    case "ARPA/evaluate_fire_radiant_energy" => processImageView.setImage(new Image(new FileInputStream(processDeclareAlarmIdle)))
+    case "prefect/declare_alarm_state" => processImageView.setImage(new Image(new FileInputStream(processComplete)))
   }
 
 
