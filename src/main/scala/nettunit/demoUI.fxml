@@ -72,7 +72,7 @@
                               <TextField fx:id="emergencyTypeField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                      </children>
                   </GridPane>
-                  <Button fx:id="sendJixelEventButton" layoutX="171.0" layoutY="345.0" mnemonicParsing="false" onAction="#applyEmergencyPlan" prefHeight="40.0" prefWidth="205.0" text="Send JIXEL event to MUSA" />
+                  <Button fx:id="sendJixelEventButton" layoutX="171.0" layoutY="345.0" mnemonicParsing="false" onAction="#onSendJixelEventButtonClick" prefHeight="40.0" prefWidth="205.0" text="Send JIXEL event to MUSA" />
                     </children></AnchorPane>
             </content>
         </Tab>

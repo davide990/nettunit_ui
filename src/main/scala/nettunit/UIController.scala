@@ -1,5 +1,10 @@
 package nettunit
 
+import JixelAPIInterface.JixelInterface
+import JixelAPIInterface.Login.ECOSUsers
+import RabbitMQ.Launchers.Jixel.JixelClientTest.jixel
+import RabbitMQ.Producer.JixelRabbitMQProducer
+import Utils.JixelUtil
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import net.liftweb.json.DefaultFormats
@@ -46,6 +51,8 @@ class UIController(private val sendJixelEventButton: Button,
   taskTypeListView.items = taskTypes
 
   implicit val formats = DefaultFormats
+
+  val login = ECOSUsers.davide_login
 
   private def imageFromResource(name: String) =
     new ImageView(new Image(getClass.getClassLoader.getResourceAsStream(name)))
@@ -210,7 +217,11 @@ class UIController(private val sendJixelEventButton: Button,
   }
 
   @FXML private[nettunit] def onSendJixelEventButtonClick(event: ActionEvent): Unit = {
-
+    jixel = new JixelRabbitMQProducer
+    val jixelUser = JixelInterface.parseToJixelCredential(JixelInterface.connect(login))
+    val ev = JixelUtil.eventFromEventSummary(login, Utils.JixelUtil.getAnyJixelEvent(login));
+    val response = jixel.notifyEvent(ev)
+    new Alert(AlertType.Information, s"MUSA Responde: ${response}").showAndWait()
   }
 
 
