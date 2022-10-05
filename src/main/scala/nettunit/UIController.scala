@@ -50,6 +50,15 @@ class UIController(private val sendJixelEventButton: Button,
   taskTypes += "prefect/declare_alarm_state"
   taskTypeListView.items = taskTypes
 
+  val processStatusIdle = getClass.getResource("/infographic-1.tiff").getFile
+  val processsSendTeamIdle = getClass.getResource("/infographic-2.tiff").getFile
+  val processActivateInternalPlanIdle = getClass.getResource("/infographic-3.tiff").getFile
+  val processDecideResponsePlanIdle = getClass.getResource("/infographic-4.tiff").getFile
+  val processDeclarePreAlertIdle = getClass.getResource("/infographic-5.tiff").getFile
+  val processEvaluateFireRadiantEnIdle = getClass.getResource("/infographic-6.tiff").getFile
+  val processDeclareAlarmIdle = getClass.getResource("/infographic-7.tiff").getFile
+  val processComplete = getClass.getResource("/infographic-8.tiff").getFile
+
   implicit val formats = DefaultFormats
 
   val login = ECOSUsers.davide_login
