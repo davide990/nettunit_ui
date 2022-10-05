@@ -14,7 +14,8 @@ import java.net.ConnectException
 
 
 @sfxml
-class UIController(private val planImageView: ImageView,
+class UIController(private val sendJixelEventButton: Button,
+                   private val planImageView: ImageView,
                    private val taskTypeListView: ListView[String],
                    private val taskIDTextField: TextField,
                    private val processIDTextField: TextField,
@@ -58,8 +59,6 @@ class UIController(private val planImageView: ImageView,
       case ad if ad.isEmpty => flowablePortTextField.getPromptText
       case _ => flowablePortTextField.getText
     }
-
-
 
     val body = s"{\n  \"emergencyPlanID\":\"${
       planIDField.getText
@@ -207,6 +206,10 @@ class UIController(private val planImageView: ImageView,
     } catch {
       case _: ConnectException => new Alert(AlertType.Error, s"unable to connect. Please check if flowable is active").showAndWait()
     }
+
+  }
+
+  @FXML private[nettunit] def onSendJixelEventButtonClick(event: ActionEvent): Unit = {
 
   }
 
