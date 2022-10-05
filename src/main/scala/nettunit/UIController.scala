@@ -20,7 +20,8 @@ import java.net.ConnectException
 
 
 @sfxml
-class UIController(private val processImageView: ImageView,
+class UIController(private val nettunitImageView: ImageView,
+                   private val processImageView: ImageView,
                    private val sendJixelEventButton: Button,
                    private val planImageView: ImageView,
                    private val taskTypeListView: ListView[String],
@@ -60,6 +61,8 @@ class UIController(private val processImageView: ImageView,
   val processEvaluateFireRadiantEnIdle = getClass.getResource("/infographic-6.png").getFile
   val processDeclareAlarmIdle = getClass.getResource("/infographic-7.png").getFile
   val processComplete = getClass.getResource("/infographic-8.png").getFile
+
+  nettunitImageView.setImage(new Image(new FileInputStream(getClass.getResource("/nettunit.png").getFile), 500, 50, false, true))
 
   implicit val formats = DefaultFormats
 
