@@ -15,11 +15,13 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafxml.core.macros.sfxml
 import scalaj.http.Http
 
+import java.io.{FileInputStream, InputStream}
 import java.net.ConnectException
 
 
 @sfxml
-class UIController(private val sendJixelEventButton: Button,
+class UIController(private val processImageView: ImageView,
+                   private val sendJixelEventButton: Button,
                    private val planImageView: ImageView,
                    private val taskTypeListView: ListView[String],
                    private val taskIDTextField: TextField,
@@ -50,14 +52,14 @@ class UIController(private val sendJixelEventButton: Button,
   taskTypes += "prefect/declare_alarm_state"
   taskTypeListView.items = taskTypes
 
-  val processStatusIdle = getClass.getResource("/infographic-1.tiff").getFile
-  val processsSendTeamIdle = getClass.getResource("/infographic-2.tiff").getFile
-  val processActivateInternalPlanIdle = getClass.getResource("/infographic-3.tiff").getFile
-  val processDecideResponsePlanIdle = getClass.getResource("/infographic-4.tiff").getFile
-  val processDeclarePreAlertIdle = getClass.getResource("/infographic-5.tiff").getFile
-  val processEvaluateFireRadiantEnIdle = getClass.getResource("/infographic-6.tiff").getFile
-  val processDeclareAlarmIdle = getClass.getResource("/infographic-7.tiff").getFile
-  val processComplete = getClass.getResource("/infographic-8.tiff").getFile
+  val processStatusIdle = getClass.getResource("/infographic-1.png").getFile
+  val processsSendTeamIdle = getClass.getResource("/infographic-2.png").getFile
+  val processActivateInternalPlanIdle = getClass.getResource("/infographic-3.png").getFile
+  val processDecideResponsePlanIdle = getClass.getResource("/infographic-4.png").getFile
+  val processDeclarePreAlertIdle = getClass.getResource("/infographic-5.png").getFile
+  val processEvaluateFireRadiantEnIdle = getClass.getResource("/infographic-6.png").getFile
+  val processDeclareAlarmIdle = getClass.getResource("/infographic-7.png").getFile
+  val processComplete = getClass.getResource("/infographic-8.png").getFile
 
   implicit val formats = DefaultFormats
 
@@ -93,6 +95,7 @@ class UIController(private val sendJixelEventButton: Button,
         .postData(body)
         .header("Content-Type", "application/json").asString
       new Alert(AlertType.Information, s"Success").showAndWait()
+      processImageView.setImage(new Image(new FileInputStream(processsSendTeamIdle)))
     } catch {
       case _: ConnectException => new Alert(AlertType.Error, s"unable to connect. Please check if flowable is active").showAndWait()
     }
@@ -144,6 +147,7 @@ class UIController(private val sendJixelEventButton: Button,
     new Alert(AlertType.Information, s"Result: ${
       resultApply.statusLine
     }").showAndWait()
+
   }
 
   @FXML private[nettunit] def completeTask(event: ActionEvent): Unit = {
@@ -180,6 +184,8 @@ class UIController(private val sendJixelEventButton: Button,
     new Alert(AlertType.Information, s"Result: ${
       resultApply.statusLine
     }").showAndWait()
+
+    updateProcessImageView()
   }
 
   @FXML private[nettunit] def failTask(event: ActionEvent): Unit = {
@@ -206,6 +212,10 @@ class UIController(private val sendJixelEventButton: Button,
         .asString
       activePlansTextArea.setText(resultApply.body)
 
+      if (activePlansTextArea.getText == "[]") {
+        processImageView.setImage(new Image(new FileInputStream(processStatusIdle)))
+      }
+
       if (!processIDTextField.getText.isEmpty) {
         val resultApply2 = Http(s"http://${
           address
@@ -231,6 +241,20 @@ class UIController(private val sendJixelEventButton: Button,
     val ev = JixelUtil.eventFromEventSummary(login, Utils.JixelUtil.getAnyJixelEvent(login));
     val response = jixel.notifyEvent(ev)
     new Alert(AlertType.Information, s"MUSA Responde: ${response}").showAndWait()
+    processImageView.setImage(new Image(new FileInputStream(processsSendTeamIdle)))
+  }
+
+  private def updateProcessImageView(): Unit = {
+    val taskType = taskTypeListView.getSelectionModel.getSelectedItems.get(0)
+
+    taskType match {
+      case "safety_manager/send_team_to_evaluate" => processImageView.setImage(new Image(new FileInputStream(processActivateInternalPlanIdle)))
+      case "plant_operator/activate_internal_security_plan" => processImageView.setImage(new Image(new FileInputStream(processDecideResponsePlanIdle)))
+      case "commander_fire_brigade/decide_response_type" => processImageView.setImage(new Image(new FileInputStream(processDeclarePreAlertIdle)))
+      case "prefect/declare_pre_alert_state" => processImageView.setImage(new Image(new FileInputStream(processEvaluateFireRadiantEnIdle)))
+      case "ARPA/evaluate_fire_radiant_energy" => processImageView.setImage(new Image(new FileInputStream(processDeclareAlarmIdle)))
+      case "prefect/declare_alarm_state" => processImageView.setImage(new Image(new FileInputStream(processComplete)))
+    }
   }
 
 
