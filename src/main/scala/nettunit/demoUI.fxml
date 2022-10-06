@@ -158,7 +158,7 @@
                                        <children>
                                           <VBox layoutX="100.0" layoutY="175.0" prefHeight="395.0" prefWidth="664.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
-                                                <TableView VBox.vgrow="ALWAYS">
+                                                <TableView fx:id="processDefTableView" VBox.vgrow="ALWAYS">
                                                   <columns>
                                                     <TableColumn fx:id="processDef_IDColumn" prefWidth="75.0" text="id" />
                                                     <TableColumn fx:id="processDef_RevColumn" prefWidth="75.0" text="rev" />
@@ -180,12 +180,27 @@
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <TableView layoutX="14.0" layoutY="14.0" prefHeight="188.0" prefWidth="462.0">
-                                            <columns>
-                                              <TableColumn prefWidth="75.0" text="C1" />
-                                              <TableColumn prefWidth="75.0" text="C2" />
-                                            </columns>
-                                          </TableView>
+                                          <VBox layoutX="343.0" layoutY="265.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <TableView fx:id="processInstanceHITableView" prefWidth="462.0" VBox.vgrow="ALWAYS">
+                                                  <columns>
+                                                    <TableColumn fx:id="processInstHi_idColumn" prefWidth="75.0" text="id" />
+                                                    <TableColumn fx:id="processInstHi_revColumn" prefWidth="75.0" text="rev" />
+                                                      <TableColumn fx:id="processInstHi_proc_inst_idColumn" prefWidth="75.0" text="Proc Instance ID" />
+                                                      <TableColumn fx:id="processInstHi_proc_def_idColumn" prefWidth="75.0" text="Proc Def ID" />
+                                                      <TableColumn fx:id="processInstHi_start_timeColumn" prefWidth="75.0" text="Start time" />
+                                                      <TableColumn fx:id="processInstHi_end_timeColumn" prefWidth="75.0" text="End time" />
+                                                      <TableColumn fx:id="processInstHi_durationColumn" prefWidth="75.0" text="Duration" />
+                                                      <TableColumn fx:id="processInstHi_start_user_idColumn" prefWidth="75.0" text="Start User ID" />
+                                                      <TableColumn fx:id="processInstHi_start_act_idColumn" prefWidth="75.0" text="Start activity ID" />
+                                                      <TableColumn fx:id="processInstHi_end_act_idColumn" prefWidth="75.0" text="End activity ID" />
+                                                      <TableColumn fx:id="processInstHi_delete_reasonColumn" prefWidth="75.0" text="Delete reason" />
+                                                  </columns>
+                                                </TableView>
+                                                <Separator prefWidth="200.0" />
+                                                <Button fx:id="processInstanceHIButton" mnemonicParsing="false" onAction="#processInstanceHIButtonClick" text="Button" VBox.vgrow="NEVER" />
+                                             </children>
+                                          </VBox>
                                        </children>
                                     </AnchorPane>
                               </content>

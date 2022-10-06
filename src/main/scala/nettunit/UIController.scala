@@ -20,12 +20,34 @@ import scalaj.http.Http
 
 import java.io.{File, FileInputStream}
 import java.net.ConnectException
+import java.sql.Timestamp
 import java.util.{Date, Timer}
 import scala.io.Source
 
 
 @sfxml
-class UIController(private val logTableView: TableView[String],
+class UIController(private val processInstanceHITableView: TableView[FlowableProcessInstanceHistoricRecord],
+                   private val processInstHi_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
+                   private val processInstHi_revColumn: TableColumn[FlowableProcessInstanceHistoricRecord, Int],
+                   private val processInstHi_proc_inst_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
+                   private val processInstHi_proc_def_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
+                   private val processInstHi_start_timeColumn: TableColumn[FlowableProcessInstanceHistoricRecord, Timestamp],
+                   private val processInstHi_end_timeColumn: TableColumn[FlowableProcessInstanceHistoricRecord, Timestamp],
+                   private val processInstHi_durationColumn: TableColumn[FlowableProcessInstanceHistoricRecord, Int],
+                   private val processInstHi_start_user_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
+                   private val processInstHi_start_act_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
+                   private val processInstHi_end_act_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
+                   private val processInstHi_delete_reasonColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
+
+                   private val processDefTableView: TableView[FlowableProcessDefRecord],
+                   private val processDef_IDColumn: TableColumn[FlowableProcessDefRecord, String],
+                   private val processDef_RevColumn: TableColumn[FlowableProcessDefRecord, Int],
+                   private val processDef_Name: TableColumn[FlowableProcessDefRecord, String],
+                   private val processDef_Key: TableColumn[FlowableProcessDefRecord, String],
+                   private val processDef_Version: TableColumn[FlowableProcessDefRecord, String],
+                   private val processDef_DeploymentID: TableColumn[FlowableProcessDefRecord, String],
+                   private val processDef_TenantID: TableColumn[FlowableProcessDefRecord, String],
+                   private val logTableView: TableView[String],
                    private val logTableColumns: TableColumn[String, String],
                    private val nettunitImageView: ImageView,
                    private val processImageView: ImageView,
@@ -60,6 +82,27 @@ class UIController(private val logTableView: TableView[String],
   taskTypes += "prefect/declare_alarm_state"
   taskTypeListView.items = taskTypes
 
+  processDef_IDColumn.cellValueFactory = _.value.id
+  processDef_RevColumn.cellValueFactory = _.value.rev
+  processDef_Name.cellValueFactory = _.value.name
+  processDef_Key.cellValueFactory = _.value.key
+  processDef_Version.cellValueFactory = _.value.version
+  processDef_DeploymentID.cellValueFactory = _.value.deployment_id
+  processDef_TenantID.cellValueFactory = _.value.tenant_id
+
+  processInstHi_idColumn.cellValueFactory = _.value.id
+  processInstHi_revColumn.cellValueFactory = _.value.rev
+  processInstHi_proc_inst_idColumn.cellValueFactory = _.value.proc_inst_id
+  processInstHi_proc_def_idColumn.cellValueFactory = _.value.proc_def_id
+  processInstHi_start_timeColumn.cellValueFactory = _.value.start_time
+  processInstHi_end_timeColumn.cellValueFactory = _.value.end_time
+  processInstHi_durationColumn.cellValueFactory = _.value.duration
+  processInstHi_start_user_idColumn.cellValueFactory = _.value.start_user_id
+  processInstHi_start_act_idColumn.cellValueFactory = _.value.start_act_id
+  processInstHi_end_act_idColumn.cellValueFactory = _.value.end_act_id
+  processInstHi_delete_reasonColumn.cellValueFactory = _.value.delete_reason
+
+
   val processStatusIdle = getClass.getResource("/infographic-1.png").getFile
   val processsSendTeamIdle = getClass.getResource("/infographic-2.png").getFile
   val processActivateInternalPlanIdle = getClass.getResource("/infographic-3.png").getFile
@@ -74,7 +117,6 @@ class UIController(private val logTableView: TableView[String],
   val login = ECOSUsers.davide_login
 
   logTableColumns.setCellValueFactory(cellData => ReadOnlyStringWrapper(cellData.getValue()));
-
 
   private def imageFromResource(name: String) =
     new ImageView(new Image(getClass.getClassLoader.getResourceAsStream(name)))
@@ -190,8 +232,20 @@ class UIController(private val logTableView: TableView[String],
   }
 
   @FXML private[nettunit] def processDefUpdateButtonClick(event: ActionEvent): Unit = {
-
+    val processDefList = FlowableDBQuery.findAllProcessDef()
+    val toAdd = processDefList.filter(pd => !processDefTableView.getItems.contains(pd))
+    toAdd.foreach(pd => processDefTableView.getItems.add(pd))
+    print("ok")
   }
+
+  @FXML private[nettunit] def processInstanceHIButtonClick(event: ActionEvent): Unit = {
+    val processInstanceHIList = FlowableDBQuery.findAllProcessInstancesHistoric()
+    val toAdd = processInstanceHIList.filter(pd => !processInstanceHITableView.getItems.contains(pd))
+    toAdd.foreach(pd => processInstanceHITableView.getItems.add(pd))
+    print("ok")
+  }
+
+
 
 
   private def updateProcessImageView() = taskTypeListView.getSelectionModel.getSelectedItems.get(0) match {
