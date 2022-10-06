@@ -90,7 +90,28 @@ case class FlowableTaskInstHistoricRecord(id_ : String,
   val delete_reason = new StringProperty(this, "delete_reason", delete_reason_.getOrElse(""))
   val priority = new ObjectProperty(this, "priority", priority_)
   val last_updated_time = new ObjectProperty(this, "last_updated_time", last_updated_time_)
+}
 
+case class FlowableActInstHistoricRecord(id_ : String,
+                                         rev_ : Int,
+                                         proc_def_id_ : String,
+                                         act_id_ : String,
+                                         act_name_ : Option[String],
+                                         act_type_ : String,
+                                         start_time_ : Timestamp,
+                                         end_time_ : Timestamp,
+                                         duration_ : Int,
+                                         delete_reason_ : Option[String]) {
+  val id = new StringProperty(this, "id", id_)
+  val rev = new ObjectProperty(this, "rev", rev_)
+  val proc_def_id = new StringProperty(this, "proc_def_id", proc_def_id_)
+  val act_id = new StringProperty(this, "act_id", act_id_)
+  val act_name = new StringProperty(this, "act_name", act_name_.getOrElse(""))
+  val act_type = new StringProperty(this, "act_type", act_type_)
+  val start_time = new ObjectProperty(this, "start_time", start_time_)
+  val end_time = new ObjectProperty(this, "end_time", end_time_)
+  val duration = new ObjectProperty(this, "duration", duration_)
+  val delete_reason = new StringProperty(this, "delete_reason", delete_reason_.getOrElse(""))
 
 }
 
@@ -122,28 +143,17 @@ object FlowableDBQuery {
     sql"select id_,rev_,proc_def_id_,task_def_key_,proc_inst_id_,name_,start_time_,end_time_,duration_,delete_reason_,priority_,last_updated_time_ from public.act_hi_taskinst"
       .query[FlowableTaskInstHistoricRecord]
       .to[List]
-      .transact(xa) // IO[List[FlowableProcessDefRecord]]
-      .unsafeRunSync() // List[FlowableProcessDefRecord]
+      .transact(xa) // IO[List[FlowableTaskInstHistoricRecord]]
+      .unsafeRunSync() // List[FlowableTaskInstHistoricRecord]
   }
 
-  case class Country(code: String, name: String, population: Long)
-
-  def find(n: String): ConnectionIO[Option[Country]] =
-    sql"select code, name, population from country where name = $n".query[Country].option
-
-  def findAll(): Unit = {
-    sql"select name from country"
-      .query[String] // Query0[String]
-      .to[List] // ConnectionIO[List[String]]
-      .transact(xa) // IO[List[String]]
-      .unsafeRunSync() // List[String]
-      .take(5) // List[String]
-      .foreach(println) // Unit
-    // Afghanistan
-    // Netherlands
-    // Netherlands Antilles
-    // Albania
-    // Algeria
+  def findAllActivitiesInstHistoric(): List[FlowableActInstHistoricRecord] = {
+    sql"select id_,rev_,proc_def_id_,act_id_,act_name_,act_type_,start_time_,end_time_,duration_,delete_reason_ from public.act_hi_actinst"
+      .query[FlowableActInstHistoricRecord]
+      .to[List]
+      .transact(xa) // IO[List[FlowableActInstHistoricRecord]]
+      .unsafeRunSync() // List[FlowableActInstHistoricRecord]
   }
+
 
 }

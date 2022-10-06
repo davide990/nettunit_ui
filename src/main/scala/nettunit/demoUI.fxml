@@ -176,7 +176,7 @@
                                        </children></AnchorPane>
                               </content>
                             </TitledPane>
-                            <TitledPane animated="false" text="Process instances">
+                            <TitledPane animated="false" text="[Historic] Process instances">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
@@ -205,7 +205,7 @@
                                     </AnchorPane>
                               </content>
                             </TitledPane>
-                            <TitledPane animated="false" text="Tasks">
+                            <TitledPane animated="false" text="[Historic] Tasks">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
@@ -234,6 +234,34 @@
                                        </children></AnchorPane>
                               </content>
                             </TitledPane>
+                              <TitledPane prefHeight="200.0" prefWidth="200.0" text="[Historic] Activities">
+                                 <content>
+                                    <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                       <children>
+                                          <VBox layoutX="3.0" layoutY="10.0" prefHeight="332.0" prefWidth="517.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <TableView fx:id="actInstanceHITableView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                                  <columns>
+                                                      <TableColumn fx:id="actInstHi_idColumn" prefWidth="75.0" text="ID" />
+                                                      <TableColumn fx:id="actInstHi_revColumn" prefWidth="75.0" text="Revision" />
+                                                    <TableColumn fx:id="actInstHi_proc_def_idColumn" prefWidth="75.0" text="Process Def ID" />
+                                                    <TableColumn fx:id="actInstHi_act_idColumn" prefWidth="75.0" text="Activity ID" />
+                                                      <TableColumn fx:id="actInstHi_act_nameColumn" prefWidth="75.0" text="Activity name" />
+                                                      <TableColumn fx:id="actInstHi_act_typeColumn" prefWidth="75.0" text="Type" />
+                                                      <TableColumn fx:id="actInstHi_start_timeColumn" prefWidth="75.0" text="Start time" />
+                                                      <TableColumn fx:id="actInstHi_end_timeColumn" prefWidth="75.0" text="End time" />
+                                                      <TableColumn fx:id="actInstHi_durationColumn" prefWidth="75.0" text="Duration" />
+                                                      <TableColumn fx:id="actInstHi_delete_reasonColumn" prefWidth="75.0" text="Delete reason" />
+                                                  </columns>
+                                                </TableView>
+                                                <Separator prefWidth="200.0" />
+                                                <Button fx:id="actInstanceHIButton" mnemonicParsing="false" onAction="#actInstanceHIButtonClick" text="Update" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
                           </panes>
                         </Accordion>
                      </children>

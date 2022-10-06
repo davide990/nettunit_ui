@@ -25,7 +25,19 @@ import java.util.{Date, Timer}
 import scala.io.Source
 
 @sfxml
-class UIController(private val taskInstanceHITableView: TableView[FlowableTaskInstHistoricRecord],
+class UIController(private val actInstanceHITableView: TableView[FlowableActInstHistoricRecord],
+                   private val actInstHi_idColumn: TableColumn[FlowableActInstHistoricRecord, String],
+                   private val actInstHi_revColumn: TableColumn[FlowableActInstHistoricRecord, Int],
+                   private val actInstHi_proc_def_idColumn: TableColumn[FlowableActInstHistoricRecord, String],
+                   private val actInstHi_act_idColumn: TableColumn[FlowableActInstHistoricRecord, String],
+                   private val actInstHi_act_nameColumn: TableColumn[FlowableActInstHistoricRecord, String],
+                   private val actInstHi_act_typeColumn: TableColumn[FlowableActInstHistoricRecord, String],
+                   private val actInstHi_start_timeColumn: TableColumn[FlowableActInstHistoricRecord, Timestamp],
+                   private val actInstHi_end_timeColumn: TableColumn[FlowableActInstHistoricRecord, Timestamp],
+                   private val actInstHi_durationColumn: TableColumn[FlowableActInstHistoricRecord, Int],
+                   private val actInstHi_delete_reasonColumn: TableColumn[FlowableActInstHistoricRecord, String],
+
+                   private val taskInstanceHITableView: TableView[FlowableTaskInstHistoricRecord],
                    private val taskInstHi_idColumn: TableColumn[FlowableTaskInstHistoricRecord, String],
                    private val taskInstHi_revColumn: TableColumn[FlowableTaskInstHistoricRecord, Int],
                    private val taskInstHi_proc_def_idColumn: TableColumn[FlowableTaskInstHistoricRecord, String],
@@ -127,6 +139,17 @@ class UIController(private val taskInstanceHITableView: TableView[FlowableTaskIn
   taskInstHi_delete_reasonColumn.cellValueFactory = _.value.delete_reason
   taskInstHi_priorityColumn.cellValueFactory = _.value.priority
   taskInstHi_last_updated_timeColumn.cellValueFactory = _.value.last_updated_time
+
+  actInstHi_idColumn.cellValueFactory = _.value.id
+  actInstHi_revColumn.cellValueFactory = _.value.rev
+  actInstHi_proc_def_idColumn.cellValueFactory = _.value.proc_def_id
+  actInstHi_act_idColumn.cellValueFactory = _.value.act_id
+  actInstHi_act_nameColumn.cellValueFactory = _.value.act_name
+  actInstHi_act_typeColumn.cellValueFactory = _.value.act_type
+  actInstHi_start_timeColumn.cellValueFactory = _.value.start_time
+  actInstHi_end_timeColumn.cellValueFactory = _.value.end_time
+  actInstHi_durationColumn.cellValueFactory = _.value.duration
+  actInstHi_delete_reasonColumn.cellValueFactory = _.value.delete_reason
 
   val processStatusIdle = getClass.getResource("/infographic-1.png").getFile
   val processsSendTeamIdle = getClass.getResource("/infographic-2.png").getFile
@@ -274,6 +297,13 @@ class UIController(private val taskInstanceHITableView: TableView[FlowableTaskIn
     val taskList = FlowableDBQuery.findAllTaskInstHistoric()
     val toAdd = taskList.filter(pd => !taskInstanceHITableView.getItems.contains(pd))
     toAdd.foreach(pd => taskInstanceHITableView.getItems.add(pd))
+    print("ok")
+  }
+
+  @FXML private[nettunit] def actInstanceHIButtonClick(event: ActionEvent): Unit = {
+    val actList = FlowableDBQuery.findAllActivitiesInstHistoric()
+    val toAdd = actList.filter(pd => !actInstanceHITableView.getItems.contains(pd))
+    toAdd.foreach(pd => actInstanceHITableView.getItems.add(pd))
     print("ok")
   }
 
