@@ -92,13 +92,13 @@
                           <children>
                               <Label layoutX="64.0" layoutY="158.0" text="Available tasks" />
                               <Button fx:id="updateViewQueryButton" layoutX="743.0" layoutY="222.0" mnemonicParsing="false" onAction="#updateProcessQueryView" text="Update View" />
-                              <Button fx:id="completeTaskButton" layoutX="730.0" layoutY="378.0" mnemonicParsing="false" onAction="#completeTask" style="-fx-background-color: darkgreen;" text="Complete Task" textFill="WHITE" textOverrun="CLIP" />
-                              <Button fx:id="failTaskButton" layoutX="620.0" layoutY="378.0" mnemonicParsing="false" onAction="#failTask" prefHeight="26.0" prefWidth="98.0" style="-fx-background-color: darkred;" text="Fail Task" textFill="WHITE" />
+                              <Button fx:id="completeTaskButton" layoutX="687.0" layoutY="378.0" mnemonicParsing="false" onAction="#completeTask" style="-fx-background-color: darkgreen;" text="Complete HumanTask" textFill="WHITE" textOverrun="CLIP" />
+                              <Button fx:id="failTaskButton" layoutX="532.0" layoutY="378.0" mnemonicParsing="false" onAction="#failTask" prefHeight="26.0" prefWidth="146.0" style="-fx-background-color: darkred;" text="Fail Human Task" textFill="WHITE" />
                         <TextArea fx:id="activeTasksTextArea" layoutX="153.0" layoutY="158.0" prefHeight="64.0" prefWidth="677.0" />
                         <TextField fx:id="processIDTextField" layoutX="153.0" layoutY="119.0" prefHeight="26.0" prefWidth="678.0" />
                         <Label layoutX="86.0" layoutY="124.0" text="Process ID" />
                         <TextField fx:id="taskIDTextField" layoutX="155.0" layoutY="337.0" prefHeight="26.0" prefWidth="677.0" promptText="something like ac1bff24-431a-11ed-b04d-76b363516a6f" />
-                        <Label layoutX="105.0" layoutY="342.0" text="Task ID" />
+                        <Label layoutX="54.0" layoutY="342.0" text="Human Task ID" />
                         <Label layoutX="46.0" layoutY="267.0" text="Humam Task type" />
                         <ListView fx:id="taskTypeListView" layoutX="155.0" layoutY="264.0" prefHeight="67.0" prefWidth="676.0" />
                               <Label layoutX="14.0" layoutY="14.0" text="Active Emergency plans" />
@@ -127,15 +127,13 @@
                                     </AnchorPane>
                               </content>
                             </Tab>
-                            <Tab text="Process Log">
+                            <Tab text="Fail Service task">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <TableView fx:id="logTableView" layoutX="48.0" layoutY="-7.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <columns>
-                                              <TableColumn fx:id="logTableColumns" editable="false" minWidth="500.0" prefWidth="-1.0" resizable="false" sortable="false" text="Log" />
-                                            </columns>
-                                          </TableView>
+                                          <ListView layoutX="14.0" layoutY="39.0" prefHeight="122.0" prefWidth="798.0" />
+                                          <Label layoutX="14.0" layoutY="14.0" text="Available services" />
+                                          <Button layoutX="676.0" layoutY="167.0" mnemonicParsing="false" onAction="#submitServiceTaskFailureButtonClick" style="-fx-background-color: darkred;" text="Submit failure request" textFill="WHITE" />
                                        </children>
                                     </AnchorPane>
                               </content>

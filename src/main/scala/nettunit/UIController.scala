@@ -283,27 +283,30 @@ class UIController(private val actInstanceHITableView: TableView[FlowableActInst
     val processDefList = FlowableDBQuery.findAllProcessDef()
     val toAdd = processDefList.filter(pd => !processDefTableView.getItems.contains(pd))
     toAdd.foreach(pd => processDefTableView.getItems.add(pd))
-    print("ok")
   }
 
   @FXML private[nettunit] def processInstanceHIButtonClick(event: ActionEvent): Unit = {
     val processInstanceHIList = FlowableDBQuery.findAllProcessInstancesHistoric()
     val toAdd = processInstanceHIList.filter(pd => !processInstanceHITableView.getItems.contains(pd))
     toAdd.foreach(pd => processInstanceHITableView.getItems.add(pd))
-    print("ok")
   }
 
   @FXML private[nettunit] def taskInstanceHIButtonClick(event: ActionEvent): Unit = {
     val taskList = FlowableDBQuery.findAllTaskInstHistoric()
     val toAdd = taskList.filter(pd => !taskInstanceHITableView.getItems.contains(pd))
     toAdd.foreach(pd => taskInstanceHITableView.getItems.add(pd))
-    print("ok")
   }
 
   @FXML private[nettunit] def actInstanceHIButtonClick(event: ActionEvent): Unit = {
     val actList = FlowableDBQuery.findAllActivitiesInstHistoric()
     val toAdd = actList.filter(pd => !actInstanceHITableView.getItems.contains(pd))
     toAdd.foreach(pd => actInstanceHITableView.getItems.add(pd))
+  }
+
+
+
+  @FXML private[nettunit] def submitServiceTaskFailureButtonClick(event: ActionEvent): Unit = {
+
     print("ok")
   }
 
