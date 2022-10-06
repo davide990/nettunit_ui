@@ -25,7 +25,8 @@ import java.util.{Date, Timer}
 import scala.io.Source
 
 @sfxml
-class UIController(private val actInstanceHITableView: TableView[FlowableActInstHistoricRecord],
+class UIController(private val serviceTaskListView: ListView[String],
+                   private val actInstanceHITableView: TableView[FlowableActInstHistoricRecord],
                    private val actInstHi_idColumn: TableColumn[FlowableActInstHistoricRecord, String],
                    private val actInstHi_revColumn: TableColumn[FlowableActInstHistoricRecord, Int],
                    private val actInstHi_proc_def_idColumn: TableColumn[FlowableActInstHistoricRecord, String],
@@ -72,8 +73,6 @@ class UIController(private val actInstanceHITableView: TableView[FlowableActInst
                    private val processDef_Version: TableColumn[FlowableProcessDefRecord, String],
                    private val processDef_DeploymentID: TableColumn[FlowableProcessDefRecord, String],
                    private val processDef_TenantID: TableColumn[FlowableProcessDefRecord, String],
-                   private val logTableView: TableView[String],
-                   private val logTableColumns: TableColumn[String, String],
                    private val nettunitImageView: ImageView,
                    private val processImageView: ImageView,
                    private val sendJixelEventButton: Button,
@@ -106,6 +105,16 @@ class UIController(private val actInstanceHITableView: TableView[FlowableActInst
   taskTypes += "ARPA/evaluate_fire_radiant_energy"
   taskTypes += "prefect/declare_alarm_state"
   taskTypeListView.items = taskTypes
+
+  val serviceTasks = ObservableBuffer("do_crossborder_communication")
+  serviceTasks += "ensure_presence_of_qualified_personnel"
+  serviceTasks += "ensure_presence_of_representative"
+  serviceTasks += "inform_technical_rescue_organisation_alert"
+  serviceTasks += "inform_technical_rescue_organisation_internal_plan"
+  serviceTasks += "keep_update_involved_personnel"
+  serviceTasks += "notify_competent_body_internal_plan"
+  serviceTasks += "prepare_tech_report"
+  serviceTaskListView.items = serviceTasks
 
   processDef_IDColumn.cellValueFactory = _.value.id
   processDef_RevColumn.cellValueFactory = _.value.rev
@@ -164,7 +173,6 @@ class UIController(private val actInstanceHITableView: TableView[FlowableActInst
 
   val login = ECOSUsers.davide_login
 
-  logTableColumns.setCellValueFactory(cellData => ReadOnlyStringWrapper(cellData.getValue()));
 
   private def imageFromResource(name: String) =
     new ImageView(new Image(getClass.getClassLoader.getResourceAsStream(name)))
@@ -302,8 +310,6 @@ class UIController(private val actInstanceHITableView: TableView[FlowableActInst
     val toAdd = actList.filter(pd => !actInstanceHITableView.getItems.contains(pd))
     toAdd.foreach(pd => actInstanceHITableView.getItems.add(pd))
   }
-
-
 
   @FXML private[nettunit] def submitServiceTaskFailureButtonClick(event: ActionEvent): Unit = {
 
