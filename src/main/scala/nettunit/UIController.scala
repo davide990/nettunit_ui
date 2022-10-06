@@ -24,9 +24,22 @@ import java.sql.Timestamp
 import java.util.{Date, Timer}
 import scala.io.Source
 
-
 @sfxml
-class UIController(private val processInstanceHITableView: TableView[FlowableProcessInstanceHistoricRecord],
+class UIController(private val taskInstanceHITableView: TableView[FlowableTaskInstHistoricRecord],
+                   private val taskInstHi_idColumn: TableColumn[FlowableTaskInstHistoricRecord, String],
+                   private val taskInstHi_revColumn: TableColumn[FlowableTaskInstHistoricRecord, Int],
+                   private val taskInstHi_proc_def_idColumn: TableColumn[FlowableTaskInstHistoricRecord, String],
+                   private val taskInstHi_task_def_keyColumn: TableColumn[FlowableTaskInstHistoricRecord, String],
+                   private val taskInstHi_proc_inst_idColumn: TableColumn[FlowableTaskInstHistoricRecord, String],
+                   private val taskInstHi_nameColumn: TableColumn[FlowableTaskInstHistoricRecord, String],
+                   private val taskInstHi_start_timeColumn: TableColumn[FlowableTaskInstHistoricRecord, Timestamp],
+                   private val taskInstHi_end_timeColumn: TableColumn[FlowableTaskInstHistoricRecord, Timestamp],
+                   private val taskInstHi_durationColumn: TableColumn[FlowableTaskInstHistoricRecord, Int],
+                   private val taskInstHi_delete_reasonColumn: TableColumn[FlowableTaskInstHistoricRecord, String],
+                   private val taskInstHi_priorityColumn: TableColumn[FlowableTaskInstHistoricRecord, Int],
+                   private val taskInstHi_last_updated_timeColumn: TableColumn[FlowableTaskInstHistoricRecord, Timestamp],
+
+                   private val processInstanceHITableView: TableView[FlowableProcessInstanceHistoricRecord],
                    private val processInstHi_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
                    private val processInstHi_revColumn: TableColumn[FlowableProcessInstanceHistoricRecord, Int],
                    private val processInstHi_proc_inst_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
@@ -102,6 +115,18 @@ class UIController(private val processInstanceHITableView: TableView[FlowablePro
   processInstHi_end_act_idColumn.cellValueFactory = _.value.end_act_id
   processInstHi_delete_reasonColumn.cellValueFactory = _.value.delete_reason
 
+  taskInstHi_idColumn.cellValueFactory = _.value.id
+  taskInstHi_revColumn.cellValueFactory = _.value.rev
+  taskInstHi_proc_def_idColumn.cellValueFactory = _.value.proc_def_id
+  taskInstHi_task_def_keyColumn.cellValueFactory = _.value.task_def_key
+  taskInstHi_proc_inst_idColumn.cellValueFactory = _.value.proc_inst_id
+  taskInstHi_nameColumn.cellValueFactory = _.value.name
+  taskInstHi_start_timeColumn.cellValueFactory = _.value.start_time
+  taskInstHi_end_timeColumn.cellValueFactory = _.value.end_time
+  taskInstHi_durationColumn.cellValueFactory = _.value.duration
+  taskInstHi_delete_reasonColumn.cellValueFactory = _.value.delete_reason
+  taskInstHi_priorityColumn.cellValueFactory = _.value.priority
+  taskInstHi_last_updated_timeColumn.cellValueFactory = _.value.last_updated_time
 
   val processStatusIdle = getClass.getResource("/infographic-1.png").getFile
   val processsSendTeamIdle = getClass.getResource("/infographic-2.png").getFile
@@ -245,8 +270,12 @@ class UIController(private val processInstanceHITableView: TableView[FlowablePro
     print("ok")
   }
 
-
-
+  @FXML private[nettunit] def taskInstanceHIButtonClick(event: ActionEvent): Unit = {
+    val taskList = FlowableDBQuery.findAllTaskInstHistoric()
+    val toAdd = taskList.filter(pd => !taskInstanceHITableView.getItems.contains(pd))
+    toAdd.foreach(pd => taskInstanceHITableView.getItems.add(pd))
+    print("ok")
+  }
 
   private def updateProcessImageView() = taskTypeListView.getSelectionModel.getSelectedItems.get(0) match {
     case "safety_manager/send_team_to_evaluate" => processImageView.setImage(new Image(new FileInputStream(processActivateInternalPlanIdle)))

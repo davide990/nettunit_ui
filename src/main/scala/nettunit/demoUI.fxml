@@ -198,16 +198,40 @@
                                                   </columns>
                                                 </TableView>
                                                 <Separator prefWidth="200.0" />
-                                                <Button fx:id="processInstanceHIButton" mnemonicParsing="false" onAction="#processInstanceHIButtonClick" text="Button" VBox.vgrow="NEVER" />
+                                                <Button fx:id="processInstanceHIButton" mnemonicParsing="false" onAction="#processInstanceHIButtonClick" text="Update" VBox.vgrow="NEVER" />
                                              </children>
                                           </VBox>
                                        </children>
                                     </AnchorPane>
                               </content>
                             </TitledPane>
-                            <TitledPane animated="false" text="Process activities">
+                            <TitledPane animated="false" text="Tasks">
                               <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <VBox layoutX="229.0" layoutY="84.0" prefHeight="370.0" prefWidth="491.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <TableView fx:id="taskInstanceHITableView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                                  <columns>
+                                                      <TableColumn fx:id="taskInstHi_idColumn" prefWidth="75.0" text="ID" />
+                                                      <TableColumn fx:id="taskInstHi_revColumn" prefWidth="75.0" text="Revision" />
+                                                      <TableColumn fx:id="taskInstHi_proc_def_idColumn" prefWidth="75.0" text="Process Def ID" />
+                                                      <TableColumn fx:id="taskInstHi_task_def_keyColumn" prefWidth="75.0" text="Task Def ID" />
+                                                    <TableColumn fx:id="taskInstHi_proc_inst_idColumn" prefWidth="75.0" text="Process Inst ID" />
+                                                    <TableColumn fx:id="taskInstHi_nameColumn" prefWidth="75.0" text="name" />
+                                                      <TableColumn fx:id="taskInstHi_start_timeColumn" prefWidth="75.0" text="start time" />
+                                                      <TableColumn fx:id="taskInstHi_end_timeColumn" prefWidth="75.0" text="end time" />
+                                                      <TableColumn fx:id="taskInstHi_durationColumn" prefWidth="75.0" text="duration" />
+                                                      <TableColumn fx:id="taskInstHi_delete_reasonColumn" prefWidth="75.0" text="delete reason" />
+                                                      <TableColumn fx:id="taskInstHi_priorityColumn" prefWidth="75.0" text="priority" />
+                                                      <TableColumn fx:id="taskInstHi_last_updated_timeColumn" prefWidth="75.0" text="last update time" />
+                                                  </columns>
+                                                </TableView>
+                                                <Separator prefWidth="200.0" />
+                                                <Button fx:id="taskInstanceHIButton" mnemonicParsing="false" onAction="#taskInstanceHIButtonClick" text="Update" VBox.vgrow="NEVER" />
+                                             </children>
+                                          </VBox>
+                                       </children></AnchorPane>
                               </content>
                             </TitledPane>
                           </panes>
