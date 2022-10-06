@@ -5,9 +5,12 @@ import JixelAPIInterface.Login.ECOSUsers
 import RabbitMQ.Launchers.Jixel.JixelClientTest.jixel
 import RabbitMQ.Producer.JixelRabbitMQProducer
 import Utils.JixelUtil
+import javafx.collections.{FXCollections, ObservableList}
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import net.liftweb.json.DefaultFormats
+import scalafx.application.Platform
+import scalafx.beans.property.ReadOnlyStringWrapper
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
@@ -15,12 +18,16 @@ import scalafx.scene.image.{Image, ImageView}
 import scalafxml.core.macros.sfxml
 import scalaj.http.Http
 
-import java.io.FileInputStream
+import java.io.{File, FileInputStream}
 import java.net.ConnectException
+import java.util.{Date, Timer}
+import scala.io.Source
 
 
 @sfxml
-class UIController(private val nettunitImageView: ImageView,
+class UIController(private val logTableView: TableView[String],
+                   private val logTableColumns: TableColumn[String, String],
+                   private val nettunitImageView: ImageView,
                    private val processImageView: ImageView,
                    private val sendJixelEventButton: Button,
                    private val planImageView: ImageView,
@@ -65,6 +72,9 @@ class UIController(private val nettunitImageView: ImageView,
   nettunitImageView.setImage(new Image(new FileInputStream(getClass.getResource("/nettunit.png").getFile), 500, 50, false, true))
 
   val login = ECOSUsers.davide_login
+
+  logTableColumns.setCellValueFactory(cellData => ReadOnlyStringWrapper(cellData.getValue()));
+
 
   private def imageFromResource(name: String) =
     new ImageView(new Image(getClass.getClassLoader.getResourceAsStream(name)))
@@ -178,6 +188,11 @@ class UIController(private val nettunitImageView: ImageView,
     new Alert(AlertType.Information, s"MUSA Responde: ${response}").showAndWait()
     processImageView.setImage(new Image(new FileInputStream(processsSendTeamIdle)))
   }
+
+  @FXML private[nettunit] def processDefUpdateButtonClick(event: ActionEvent): Unit = {
+
+  }
+
 
   private def updateProcessImageView() = taskTypeListView.getSelectionModel.getSelectedItems.get(0) match {
     case "safety_manager/send_team_to_evaluate" => processImageView.setImage(new Image(new FileInputStream(processActivateInternalPlanIdle)))
