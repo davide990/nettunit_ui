@@ -15,6 +15,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
 import scalafx.scene.image.{Image, ImageView}
+import scalafx.scene.shape.Circle
 import scalafxml.core.macros.sfxml
 import scalaj.http.Http
 
@@ -27,7 +28,32 @@ import scala.io.Source
 case class ServiceTaskView(view: String, fullClassName: String)
 
 @sfxml
-class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
+class UIController(private val do_crossborder_communication_circle: Circle,
+                   private val ensure_presence_of_qualified_personnel_circle: Circle,
+                   private val ensure_presence_of_representative_circle: Circle,
+                   private val inform_technical_rescue_organisation_alert_circle: Circle,
+                   private val inform_technical_rescue_organisation_internal_plan_circle: Circle,
+                   private val keep_update_involved_personnel_circle: Circle,
+                   private val notify_competent_body_internal_plan_circle: Circle,
+                   private val prepare_tech_report_circle: Circle,
+
+                   private val sendTeamImage: ImageView,
+                   private val activateInternalPlanImage: ImageView,
+                   private val InformRescueInternalPlanImage: ImageView,
+                   private val decideResponseTypeImage: ImageView,
+                   private val prepareReportImage: ImageView,
+                   private val keepUpdateImage: ImageView,
+                   private val declarePreAlertImage: ImageView,
+                   private val informRescueAlertImage: ImageView,
+                   private val evaluateFireRadiantImage: ImageView,
+                   private val declareAlarmImage: ImageView,
+                   private val notifyCompetentBodiesImage: ImageView,
+                   private val ensurePresenceImage: ImageView,
+                   private val doCrossBorderImage: ImageView,
+                   private val ensureQualifiedPersonnelImage: ImageView,
+                   private val adaptationTaskImage: ImageView,
+
+                   private val serviceTaskListView: ListView[ServiceTaskView],
                    private val actInstanceHITableView: TableView[FlowableActInstHistoricRecord],
                    private val actInstHi_idColumn: TableColumn[FlowableActInstHistoricRecord, String],
                    private val actInstHi_revColumn: TableColumn[FlowableActInstHistoricRecord, Int],
@@ -35,8 +61,8 @@ class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
                    private val actInstHi_act_idColumn: TableColumn[FlowableActInstHistoricRecord, String],
                    private val actInstHi_act_nameColumn: TableColumn[FlowableActInstHistoricRecord, String],
                    private val actInstHi_act_typeColumn: TableColumn[FlowableActInstHistoricRecord, String],
-                   private val actInstHi_start_timeColumn: TableColumn[FlowableActInstHistoricRecord, Timestamp],
-                   private val actInstHi_end_timeColumn: TableColumn[FlowableActInstHistoricRecord, Timestamp],
+                   private val actInstHi_start_timeColumn: TableColumn[FlowableActInstHistoricRecord, Option[Timestamp]],
+                   private val actInstHi_end_timeColumn: TableColumn[FlowableActInstHistoricRecord, Option[Timestamp]],
                    private val actInstHi_durationColumn: TableColumn[FlowableActInstHistoricRecord, Int],
                    private val actInstHi_delete_reasonColumn: TableColumn[FlowableActInstHistoricRecord, String],
 
@@ -48,7 +74,7 @@ class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
                    private val taskInstHi_proc_inst_idColumn: TableColumn[FlowableTaskInstHistoricRecord, String],
                    private val taskInstHi_nameColumn: TableColumn[FlowableTaskInstHistoricRecord, String],
                    private val taskInstHi_start_timeColumn: TableColumn[FlowableTaskInstHistoricRecord, Timestamp],
-                   private val taskInstHi_end_timeColumn: TableColumn[FlowableTaskInstHistoricRecord, Timestamp],
+                   private val taskInstHi_end_timeColumn: TableColumn[FlowableTaskInstHistoricRecord, Option[Timestamp]],
                    private val taskInstHi_durationColumn: TableColumn[FlowableTaskInstHistoricRecord, Int],
                    private val taskInstHi_delete_reasonColumn: TableColumn[FlowableTaskInstHistoricRecord, String],
                    private val taskInstHi_priorityColumn: TableColumn[FlowableTaskInstHistoricRecord, Int],
@@ -60,7 +86,7 @@ class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
                    private val processInstHi_proc_inst_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
                    private val processInstHi_proc_def_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
                    private val processInstHi_start_timeColumn: TableColumn[FlowableProcessInstanceHistoricRecord, Timestamp],
-                   private val processInstHi_end_timeColumn: TableColumn[FlowableProcessInstanceHistoricRecord, Timestamp],
+                   private val processInstHi_end_timeColumn: TableColumn[FlowableProcessInstanceHistoricRecord, Option[Timestamp]],
                    private val processInstHi_durationColumn: TableColumn[FlowableProcessInstanceHistoricRecord, Int],
                    private val processInstHi_start_user_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
                    private val processInstHi_start_act_idColumn: TableColumn[FlowableProcessInstanceHistoricRecord, String],
@@ -114,6 +140,11 @@ class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
       cell.item.onChange { (_, _, st) => {
         if (st != null) {
           cell.text = st.view
+          if (failingTaskName.isDefined) {
+            if (st.view == failingTaskName.get) {
+              cell.setStyle("-fx-background-color: darkred;-fx-text-fill: white;")
+            }
+          }
         }
       }
       }
@@ -176,6 +207,36 @@ class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
   actInstHi_durationColumn.cellValueFactory = _.value.duration
   actInstHi_delete_reasonColumn.cellValueFactory = _.value.delete_reason
 
+  val processImage = new Image(new FileInputStream(getClass.getResource("/process.png").getFile))
+
+  val acceptIconFile = getClass.getResource("/icons/accept.png").getFile
+  val acceptHumanIconFile = getClass.getResource("/icons/settings.png").getFile
+  val pendingIconFile = getClass.getResource("/icons/pending.png").getFile
+  val warningIconFile = getClass.getResource("/icons/warning.png").getFile
+
+  val acceptIcon = new Image(new FileInputStream(acceptIconFile))
+  val acceptHumanIcon = new Image(new FileInputStream(acceptHumanIconFile))
+  val pendingIcon = new Image(new FileInputStream(pendingIconFile))
+  val warningIcon = new Image(new FileInputStream(warningIconFile))
+
+  var failingTaskName: Option[String] = None
+
+  sendTeamImage.setVisible(false)
+  activateInternalPlanImage.setVisible(false)
+  InformRescueInternalPlanImage.setVisible(false)
+  decideResponseTypeImage.setVisible(false)
+  prepareReportImage.setVisible(false)
+  keepUpdateImage.setVisible(false)
+  declarePreAlertImage.setVisible(false)
+  informRescueAlertImage.setVisible(false)
+  evaluateFireRadiantImage.setVisible(false)
+  declareAlarmImage.setVisible(false)
+  notifyCompetentBodiesImage.setVisible(false)
+  ensurePresenceImage.setVisible(false)
+  doCrossBorderImage.setVisible(false)
+  ensureQualifiedPersonnelImage.setVisible(false)
+  adaptationTaskImage.setVisible(false)
+
   val processStatusIdle = getClass.getResource("/infographic-1.png").getFile
   val processsSendTeamIdle = getClass.getResource("/infographic-2.png").getFile
   val processActivateInternalPlanIdle = getClass.getResource("/infographic-3.png").getFile
@@ -219,7 +280,7 @@ class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
 
   @FXML private[nettunit] def onConvertGoalsToBPMN(event: ActionEvent): Unit = {
     val goals = new String(GoalSPECTextArea.getText.getBytes(), "UTF-8")
-    val connectionString=s"http://$getMUSAAddress:$getMUSAAddressPort/Goal2BPMN"
+    val connectionString = s"http://$getMUSAAddress:$getMUSAAddressPort/Goal2BPMN"
     val resultApply = Http(connectionString)
       .header("Content-Type", "text/plain")
       .postData(goals)
@@ -228,7 +289,7 @@ class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
   }
 
   @FXML private[nettunit] def onDeployProcessToFlowable(event: ActionEvent): Unit = {
-    val connectionString=s"http://$getMUSAAddress:$getMUSAAddressPort/Deploy"
+    val connectionString = s"http://$getMUSAAddress:$getMUSAAddressPort/Deploy"
     val resultApply = Http(connectionString)
       .header("Content-Type", "text/xml")
       .postData(BPMNTextArea.getText)
@@ -251,9 +312,10 @@ class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
       new Alert(AlertType.Information, s"Result: ${
         resultApply.statusLine
       }").showAndWait()
-      updateProcessImageView()
+      //updateProcessImageView()
+      updateProcessIconImageViews()
     } catch {
-      case _: SocketTimeoutException =>  new Alert(AlertType.Error, s"Socket timeout").showAndWait()
+      case _: SocketTimeoutException => new Alert(AlertType.Error, s"Socket timeout").showAndWait()
     }
   }
 
@@ -304,8 +366,10 @@ class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
     val jixelUser = JixelInterface.parseToJixelCredential(JixelInterface.connect(login))
     val ev = JixelUtil.eventFromEventSummary(login, Utils.JixelUtil.getAnyJixelEvent(login));
     val response = jixel.notifyEvent(ev)
-    new Alert(AlertType.Information, s"MUSA Responde: ${response}").showAndWait()
-    processImageView.setImage(new Image(new FileInputStream(processsSendTeamIdle)))
+    new Alert(AlertType.Information, s"MUSA Response: ${response}").showAndWait()
+    processImageView.setImage(processImage)
+    sendTeamImage.setImage(pendingIcon)
+    sendTeamImage.setVisible(true)
   }
 
   @FXML private[nettunit] def processDefUpdateButtonClick(event: ActionEvent): Unit = {
@@ -334,6 +398,11 @@ class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
 
   @FXML private[nettunit] def submitServiceTaskFailureButtonClick(event: ActionEvent): Unit = {
     val serviceTask = serviceTaskListView.getSelectionModel.getSelectedItems.get(0)
+
+    failingTaskName = Some(serviceTask.view)
+
+    serviceTaskListView.refresh()
+
     val connectionURL = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/fail/${serviceTask.fullClassName}"
     val resultApply = Http(connectionURL)
       .header("Content-Type", "text/xml")
@@ -350,6 +419,124 @@ class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
     case "ARPA/evaluate_fire_radiant_energy" => processImageView.setImage(new Image(new FileInputStream(processDeclareAlarmIdle)))
     case "prefect/declare_alarm_state" => processImageView.setImage(new Image(new FileInputStream(processComplete)))
   }
+
+  private def updateAdaptationTaskImageView(): Unit = {
+    adaptationTaskImage.setVisible(true)
+    adaptationTaskImage.setImage(acceptIcon)
+  }
+
+  def isFailingTask(task: String): Boolean = {
+    if (!failingTaskName.isDefined) {
+      return false
+    }
+    failingTaskName.get match {
+      case task => true
+      case _ => false
+    }
+  }
+
+  private def updateProcessIconImageViews() = taskTypeListView.getSelectionModel.getSelectedItems.get(0) match {
+    case "safety_manager/send_team_to_evaluate" => {
+      sendTeamImage.setImage(acceptHumanIcon)
+      activateInternalPlanImage.setImage(pendingIcon)
+      activateInternalPlanImage.setVisible(true)
+    }
+    case "plant_operator/activate_internal_security_plan" => {
+      activateInternalPlanImage.setImage(acceptHumanIcon)
+      InformRescueInternalPlanImage.setVisible(true)
+      isFailingTask("inform_technical_rescue_organisation_internal_plan") match {
+        case true =>
+          InformRescueInternalPlanImage.setImage(warningIcon)
+          updateAdaptationTaskImageView()
+          inform_technical_rescue_organisation_internal_plan_circle.setVisible(true)
+        case false =>
+          InformRescueInternalPlanImage.setImage(acceptIcon)
+          decideResponseTypeImage.setVisible(true)
+          decideResponseTypeImage.setImage(pendingIcon)
+      }
+    }
+    case "commander_fire_brigade/decide_response_type" => {
+      decideResponseTypeImage.setImage(acceptHumanIcon)
+
+      //prepare tech report && keep update
+      isFailingTask("prepare_tech_report") match {
+        case true =>
+          prepareReportImage.setImage(warningIcon)
+          updateAdaptationTaskImageView()
+          prepare_tech_report_circle.setVisible(true)
+        case false =>
+          prepareReportImage.setImage(acceptIcon)
+          isFailingTask("keep_update_involved_personnel") match {
+            case true =>
+              keepUpdateImage.setImage(warningIcon)
+              updateAdaptationTaskImageView()
+              keep_update_involved_personnel_circle.setVisible(true)
+            case false =>
+              keepUpdateImage.setImage(acceptIcon)
+              declarePreAlertImage.setVisible(true)
+              declarePreAlertImage.setImage(pendingIcon)
+          }
+      }
+    }
+    case "prefect/declare_pre_alert_state" => {
+      declarePreAlertImage.setImage(acceptHumanIcon)
+
+      isFailingTask("inform_technical_rescue_organisation_alert") match {
+        case true =>
+          informRescueAlertImage.setImage(warningIcon)
+          updateAdaptationTaskImageView()
+          inform_technical_rescue_organisation_alert_circle.setVisible(true)
+        case false =>
+          informRescueAlertImage.setImage(acceptIcon)
+          evaluateFireRadiantImage.setVisible(true)
+          evaluateFireRadiantImage.setImage(pendingIcon)
+      }
+    }
+    case "ARPA/evaluate_fire_radiant_energy" => {
+      evaluateFireRadiantImage.setImage(acceptHumanIcon)
+      declareAlarmImage.setVisible(true)
+      declareAlarmImage.setImage(pendingIcon)
+    }
+    case "prefect/declare_alarm_state" => {
+      processImageView.setImage(new Image(new FileInputStream(processComplete)))
+
+      isFailingTask("notify_competent_body_internal_plan") match {
+        case true =>
+          notifyCompetentBodiesImage.setImage(warningIcon)
+          updateAdaptationTaskImageView()
+          notify_competent_body_internal_plan_circle.setVisible(true)
+
+        case false =>
+          notifyCompetentBodiesImage.setImage(acceptIcon)
+          isFailingTask("ensure_presence_of_representative") match {
+            case true =>
+              ensurePresenceImage.setImage(warningIcon)
+              updateAdaptationTaskImageView()
+              ensure_presence_of_representative_circle.setVisible(true)
+            case false =>
+              ensurePresenceImage.setImage(acceptIcon)
+              isFailingTask("do_crossborder_communication") match {
+                case true =>
+                  doCrossBorderImage.setImage(warningIcon)
+                  updateAdaptationTaskImageView()
+                  do_crossborder_communication_circle.setVisible(true)
+                case false =>
+                  doCrossBorderImage.setImage(acceptIcon)
+                  isFailingTask("ensure_presence_of_qualified_personnel") match {
+                    case true =>
+                      ensureQualifiedPersonnelImage.setImage(warningIcon)
+                      updateAdaptationTaskImageView()
+                      ensure_presence_of_qualified_personnel_circle.setVisible(true)
+                    case false =>
+                      ensureQualifiedPersonnelImage.setImage(acceptIcon)
+                  }
+              }
+          }
+      }
+    }
+  }
+
+  /**/
 
 
 }

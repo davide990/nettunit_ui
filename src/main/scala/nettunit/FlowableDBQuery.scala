@@ -47,8 +47,8 @@ case class FlowableProcessInstanceHistoricRecord(id_ : String,
                                                  proc_inst_id_ : String,
                                                  proc_def_id_ : String,
                                                  start_time_ : Timestamp,
-                                                 end_time_ : Timestamp,
-                                                 duration_ : Int,
+                                                 end_time_ : Option[Timestamp],
+                                                 duration_ : Option[Int],
                                                  start_user_id_ : Option[String],
                                                  start_act_id_ : String,
                                                  end_act_id_ : Option[String],
@@ -59,7 +59,7 @@ case class FlowableProcessInstanceHistoricRecord(id_ : String,
   val proc_def_id = new StringProperty(this, "proc_def_id", proc_def_id_)
   val start_time = new ObjectProperty(this, "start_time", start_time_)
   val end_time = new ObjectProperty(this, "end_time", end_time_)
-  val duration = new ObjectProperty(this, "duration", duration_)
+  val duration = new ObjectProperty(this, "duration", duration_.getOrElse(-1))
   val start_user_id = new StringProperty(this, "start_user_id", start_user_id_.getOrElse(""))
   val start_act_id = new StringProperty(this, "start_act_id", start_act_id_)
   val end_act_id = new StringProperty(this, "end_act_id", end_act_id_.getOrElse(""))
@@ -73,10 +73,10 @@ case class FlowableTaskInstHistoricRecord(id_ : String,
                                           proc_inst_id_ : String,
                                           name_ : String,
                                           start_time_ : Timestamp,
-                                          end_time_ : Timestamp,
-                                          duration_ : Int,
+                                          end_time_ : Option[Timestamp],
+                                          duration_ : Option[Int],
                                           delete_reason_ : Option[String],
-                                          priority_ : Int,
+                                          priority_ : Option[Int],
                                           last_updated_time_ : Timestamp) {
   val id = new StringProperty(this, "id", id_)
   val rev = new ObjectProperty(this, "rev", rev_)
@@ -86,9 +86,9 @@ case class FlowableTaskInstHistoricRecord(id_ : String,
   val name = new StringProperty(this, "name", name_)
   val start_time = new ObjectProperty(this, "start_time", start_time_)
   val end_time = new ObjectProperty(this, "end_time", end_time_)
-  val duration = new ObjectProperty(this, "duration", duration_)
+  val duration = new ObjectProperty(this, "duration", duration_.getOrElse(-1))
   val delete_reason = new StringProperty(this, "delete_reason", delete_reason_.getOrElse(""))
-  val priority = new ObjectProperty(this, "priority", priority_)
+  val priority = new ObjectProperty(this, "priority", priority_.getOrElse(-1))
   val last_updated_time = new ObjectProperty(this, "last_updated_time", last_updated_time_)
 }
 
@@ -98,9 +98,9 @@ case class FlowableActInstHistoricRecord(id_ : String,
                                          act_id_ : String,
                                          act_name_ : Option[String],
                                          act_type_ : String,
-                                         start_time_ : Timestamp,
-                                         end_time_ : Timestamp,
-                                         duration_ : Int,
+                                         start_time_ : Option[Timestamp],
+                                         end_time_ : Option[Timestamp],
+                                         duration_ : Option[Int],
                                          delete_reason_ : Option[String]) {
   val id = new StringProperty(this, "id", id_)
   val rev = new ObjectProperty(this, "rev", rev_)
@@ -110,7 +110,7 @@ case class FlowableActInstHistoricRecord(id_ : String,
   val act_type = new StringProperty(this, "act_type", act_type_)
   val start_time = new ObjectProperty(this, "start_time", start_time_)
   val end_time = new ObjectProperty(this, "end_time", end_time_)
-  val duration = new ObjectProperty(this, "duration", duration_)
+  val duration = new ObjectProperty(this, "duration", duration_.getOrElse(-1))
   val delete_reason = new StringProperty(this, "delete_reason", delete_reason_.getOrElse(""))
 
 }
