@@ -28,7 +28,10 @@ import scala.io.Source
 case class ServiceTaskView(view: String, fullClassName: String)
 
 @sfxml
-class UIController(private val do_crossborder_communication_circle: Circle,
+class UIController(private val mareImageView: ImageView,
+                   private val jixelImageView: ImageView,
+                   private val nettunitHautImageView:ImageView,
+                   private val do_crossborder_communication_circle: Circle,
                    private val ensure_presence_of_qualified_personnel_circle: Circle,
                    private val ensure_presence_of_representative_circle: Circle,
                    private val inform_technical_rescue_organisation_alert_circle: Circle,
@@ -209,6 +212,14 @@ class UIController(private val do_crossborder_communication_circle: Circle,
 
   val processImage = new Image(new FileInputStream(getClass.getResource("/process.png").getFile))
 
+  val cooperationTransfrontaliereImage = new Image(new FileInputStream(getClass.getResource("/banners/nettunitHaut.png").getFile))
+  nettunitHautImageView.setImage(cooperationTransfrontaliereImage)
+
+  mareImageView.setImage(new Image(new FileInputStream(getClass.getResource("/banners/slide-1.1.png").getFile)))
+
+  jixelImageView.setImage(new Image(new FileInputStream(getClass.getResource("/jixel.png").getFile)))
+  nettunitImageView.setImage(new Image(new FileInputStream(getClass.getResource("/nettunit.png").getFile)))
+
   val acceptIconFile = getClass.getResource("/icons/accept.png").getFile
   val acceptHumanIconFile = getClass.getResource("/icons/settings.png").getFile
   val pendingIconFile = getClass.getResource("/icons/pending.png").getFile
@@ -246,7 +257,7 @@ class UIController(private val do_crossborder_communication_circle: Circle,
   val processDeclareAlarmIdle = getClass.getResource("/infographic-7.png").getFile
   val processComplete = getClass.getResource("/infographic-8.png").getFile
 
-  nettunitImageView.setImage(new Image(new FileInputStream(getClass.getResource("/nettunit.png").getFile), 500, 50, false, true))
+
 
   val login = ECOSUsers.davide_login
 

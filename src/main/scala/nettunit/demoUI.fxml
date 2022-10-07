@@ -28,32 +28,6 @@
    <children>
       <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="694.0" prefWidth="850.0" tabClosingPolicy="UNAVAILABLE">
           <tabs>
-            <Tab text="Process definition">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <Label layoutX="14.0" layoutY="31.0" text="Write your GoalSPEC definition here" />
-                        <TextArea fx:id="GoalSPECTextArea" layoutX="14.0" layoutY="52.0" prefHeight="486.0" prefWidth="357.0" promptText="Hello" text="GOAL Managing_emergency IS AND OF {&#10;&#10;GOAL send_team_to_evaluate : WHEN emergency_location(refinery) AND NOT assessed_emergency THEN THE safety_manager ROLE SHALL ADDRESS FINALLY alarm_state(attention)&#10;&#10;GOAL activate_internal_security_plan : WHEN alarm_state(attention) THEN THE plant_operator ROLE SHALL ADDRESS FINALLY internal_plan_active(active)&#10;&#10;GOAL notify_competent_body_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(prefect, attention) AND informed_authority(mayor, attention)&#10;&#10;GOAL inform_technical_rescue_organisation_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(commander_fire_brigade,attention)&#10;&#10;GOAL decide_response_type : WHEN informed(commander_fire_brigade, attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY fire_brigade_assessment_done(attention)&#10;&#10;GOAL prepare_tech_report : WHEN fire_brigade_assessment_done(attention) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY tech_report(fire,attention)&#10;&#10;GOAL keep_update_involved_personnel : WHEN tech_report(fire,attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY coordinated_firefighter_intervention AND second_explosion&#10;&#10;GOAL declare_pre_alert_state : WHEN coordinated_firefighter_intervention AND second_explosion THEN THE nettunit ROLE SHALL ADDRESS FINALLY alarm_state(pre_alert)&#10;&#10;GOAL inform_technical_rescue_organisation_alert : WHEN alarm_state(pre_alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(n118, pre_alert) AND informed(ASP, pre_alert) AND informed(ARPA, pre_alert)&#10;&#10;GOAL evaluate_fire_radiant_energy : WHEN informed(ARPA, pre_alert) AND alarm_state(pre_alert) THEN THE ARPA ROLE SHALL ADDRESS FINALLY evaluated_fire_radiant_energy&#10;&#10;GOAL declare_alarm_state : WHEN evaluated_fire_radiant_energy AND alarm_state(pre_alert) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY alarm_state(alert)&#10;&#10;GOAL ensure_presence_of_qualified_personnel : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(civil_protection,alert) AND informed_authority(municipality, alert)&#10;&#10;GOAL ensure_presence_of_representative : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(questor, alert)&#10;&#10;GOAL do_crossborder_communication : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY crossborder_inform&#10;}">
-                           <font>
-                              <Font name="Monaco" size="10.0" />
-                           </font>
-                        </TextArea>
-                        <TextArea fx:id="BPMNTextArea" layoutX="452.0" layoutY="48.0" prefHeight="490.0" prefWidth="384.0">
-                           <font>
-                              <Font name="Courier New" size="12.0" />
-                           </font>
-                        </TextArea>
-                        <Label layoutX="452.0" layoutY="31.0" text="BPMN process definition" />
-                        <Button fx:id="convertGoalSPECButton" layoutX="377.0" layoutY="196.0" mnemonicParsing="false" onAction="#onConvertGoalsToBPMN" prefHeight="26.0" prefWidth="66.0" text="to BPMN" />
-                        <Button fx:id="deployToFlowableButton" layoutX="552.0" layoutY="610.0" mnemonicParsing="false" onAction="#onDeployProcessToFlowable" prefHeight="26.0" prefWidth="282.0" text="Deploy Process to Flowable" />
-                        <TextField fx:id="MUSAAddressTextField" layoutX="552.0" layoutY="545.0" prefHeight="26.0" prefWidth="284.0" promptText="localhost" />
-                        <TextField fx:id="MUSAPortTextField" layoutX="552.0" layoutY="577.0" prefHeight="26.0" prefWidth="282.0" promptText="8081" />
-                        <Label layoutX="466.0" layoutY="550.0" text="MUSA Address" />
-                        <Label layoutX="489.0" layoutY="582.0" text="MUSA Port" />
-                     </children>
-                  </AnchorPane>
-              </content>
-            </Tab>
               <Tab text="Apply emergency plan">
                   <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
@@ -84,13 +58,44 @@
                                     <TextField fx:id="emergencyTypeField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                            </children>
                         </GridPane>
-                        <Button fx:id="sendJixelEventButton" layoutX="171.0" layoutY="380.0" mnemonicParsing="false" onAction="#onSendJixelEventButtonClick" prefHeight="40.0" prefWidth="205.0" text="Send JIXEL event to MUSA" />
+                        <Button fx:id="sendJixelEventButton" defaultButton="true" layoutX="171.0" layoutY="380.0" mnemonicParsing="false" onAction="#onSendJixelEventButtonClick" prefHeight="40.0" prefWidth="205.0" text="Send JIXEL event to MUSA" />
                         <Separator layoutX="56.0" layoutY="349.0" prefHeight="17.0" prefWidth="318.0" />
+                        <ImageView fx:id="jixelImageView" fitHeight="42.0" fitWidth="69.0" layoutX="89.0" layoutY="381.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../resources/jixel.png" />
+                           </image>
+                        </ImageView>
                           </children>
                   </AnchorPane>
                   </content>
               </Tab>
-              <Tab text="Process operations">
+            <Tab text="Process definition">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="31.0" text="Write your GoalSPEC definition here" />
+                        <TextArea fx:id="GoalSPECTextArea" layoutX="14.0" layoutY="52.0" prefHeight="486.0" prefWidth="332.0" promptText="Hello" text="GOAL Managing_emergency IS AND OF {&#10;&#10;GOAL send_team_to_evaluate : WHEN emergency_location(refinery) AND NOT assessed_emergency THEN THE safety_manager ROLE SHALL ADDRESS FINALLY alarm_state(attention)&#10;&#10;GOAL activate_internal_security_plan : WHEN alarm_state(attention) THEN THE plant_operator ROLE SHALL ADDRESS FINALLY internal_plan_active(active)&#10;&#10;GOAL notify_competent_body_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(prefect, attention) AND informed_authority(mayor, attention)&#10;&#10;GOAL inform_technical_rescue_organisation_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(commander_fire_brigade,attention)&#10;&#10;GOAL decide_response_type : WHEN informed(commander_fire_brigade, attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY fire_brigade_assessment_done(attention)&#10;&#10;GOAL prepare_tech_report : WHEN fire_brigade_assessment_done(attention) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY tech_report(fire,attention)&#10;&#10;GOAL keep_update_involved_personnel : WHEN tech_report(fire,attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY coordinated_firefighter_intervention AND second_explosion&#10;&#10;GOAL declare_pre_alert_state : WHEN coordinated_firefighter_intervention AND second_explosion THEN THE nettunit ROLE SHALL ADDRESS FINALLY alarm_state(pre_alert)&#10;&#10;GOAL inform_technical_rescue_organisation_alert : WHEN alarm_state(pre_alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(n118, pre_alert) AND informed(ASP, pre_alert) AND informed(ARPA, pre_alert)&#10;&#10;GOAL evaluate_fire_radiant_energy : WHEN informed(ARPA, pre_alert) AND alarm_state(pre_alert) THEN THE ARPA ROLE SHALL ADDRESS FINALLY evaluated_fire_radiant_energy&#10;&#10;GOAL declare_alarm_state : WHEN evaluated_fire_radiant_energy AND alarm_state(pre_alert) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY alarm_state(alert)&#10;&#10;GOAL ensure_presence_of_qualified_personnel : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(civil_protection,alert) AND informed_authority(municipality, alert)&#10;&#10;GOAL ensure_presence_of_representative : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(questor, alert)&#10;&#10;GOAL do_crossborder_communication : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY crossborder_inform&#10;}">
+                           <font>
+                              <Font name="Monaco" size="10.0" />
+                           </font>
+                        </TextArea>
+                        <TextArea fx:id="BPMNTextArea" layoutX="466.0" layoutY="48.0" prefHeight="490.0" prefWidth="370.0">
+                           <font>
+                              <Font name="Courier New" size="12.0" />
+                           </font>
+                        </TextArea>
+                        <Label layoutX="466.0" layoutY="31.0" text="BPMN process definition" />
+                        <Button fx:id="convertGoalSPECButton" layoutX="352.0" layoutY="195.0" mnemonicParsing="false" onAction="#onConvertGoalsToBPMN" prefHeight="46.0" prefWidth="107.0" text="Orchestrate solution" textAlignment="CENTER" wrapText="true" />
+                        <Button fx:id="deployToFlowableButton" layoutX="552.0" layoutY="610.0" mnemonicParsing="false" onAction="#onDeployProcessToFlowable" prefHeight="26.0" prefWidth="282.0" text="Deploy Process to Flowable" />
+                        <TextField fx:id="MUSAAddressTextField" layoutX="552.0" layoutY="545.0" prefHeight="26.0" prefWidth="284.0" promptText="localhost" />
+                        <TextField fx:id="MUSAPortTextField" layoutX="552.0" layoutY="577.0" prefHeight="26.0" prefWidth="282.0" promptText="8081" />
+                        <Label layoutX="466.0" layoutY="550.0" text="MUSA Address" />
+                        <Label layoutX="489.0" layoutY="582.0" text="MUSA Port" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+              <Tab text="Emergency plan operations">
                   <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                           <children>
@@ -356,11 +361,40 @@
                   </AnchorPane>
               </content>
             </Tab>
+            <Tab text="NETTUNIT">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: white;">
+                     <children>
+                        <ImageView fx:id="nettunitHautImageView" fitHeight="399.0" fitWidth="552.0" layoutX="159.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../resources/banners/nettunitHaut.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="mareImageView" fitHeight="214.0" fitWidth="850.0" layoutY="447.0" pickOnBounds="true">
+                           <image>
+                              <Image url="@../../resources/banners/slide-1.1.png" />
+                           </image>
+                        </ImageView>
+                        <Label layoutX="182.0" layoutY="216.0" prefHeight="171.0" prefWidth="486.0" style="-fx-background-color: rgba(0, 0, 0, 0)rgba(0, 0, 0, 0);" text="Le projet NETTUNIT vise à développer une plateforme complètement opérationnelle avec l’utilisation des alertes météorologiques, des alertes sur la pollution atmosphériques et la pollution marine destinées en particulier aux services de la Protection Civile, aux services de la santé locale et autres services d’intervention Italiens et Tunisien afin de collaborer ensemble pour une éventuelle intervention." textAlignment="JUSTIFY" wrapText="true" />
+                        <Label layoutX="182.0" layoutY="379.0" text="Ce prototype a été développé par Davide Andrea Guastella (ICAR-CNR)" />
+                        <Label layoutX="182.0" layoutY="407.0" text="MUSA a été conçu et développé par Luca Sabatucci (ICAR-CNR) et Massimo Cossentino (ICAR-CNR)" />
+                        <Label layoutX="186.0" layoutY="439.0" text="JIXEL est un produit de IES Solutions SRL" />
+                        <Label layoutX="186.0" layoutY="475.0" text="Le matériel graphique a été réalisé par:" />
+                        <Label layoutX="186.0" layoutY="500.0" text="- Aldo Cervantes - Flaticon" />
+                        <Label layoutX="186.0" layoutY="518.0" text="- Freepik - Flaticon" />
+                        <Label layoutX="186.0" layoutY="535.0" text="- azmianshori - Flaticon" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
           </tabs>
       </TabPane>
       <AnchorPane prefHeight="84.0" prefWidth="850.0">
          <children>
-            <ImageView fx:id="nettunitImageView" fitHeight="150.0" fitWidth="850.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <ImageView fx:id="nettunitImageView" fitHeight="150.0" fitWidth="850.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <image>
+                  <Image url="@../../resources/nettunit.png" />
+               </image></ImageView>
             <Label layoutX="14.0" layoutY="7.0" text="Projet NETTUNIT">
                <font>
                   <Font size="23.0" />
