@@ -10,7 +10,7 @@ import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import net.liftweb.json.DefaultFormats
 import scalafx.application.Platform
-import scalafx.beans.property.ReadOnlyStringWrapper
+import scalafx.beans.property.{ReadOnlyStringWrapper, StringProperty}
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
@@ -19,13 +19,15 @@ import scalafxml.core.macros.sfxml
 import scalaj.http.Http
 
 import java.io.{File, FileInputStream}
-import java.net.ConnectException
+import java.net.{ConnectException, SocketTimeoutException}
 import java.sql.Timestamp
 import java.util.{Date, Timer}
 import scala.io.Source
 
+case class ServiceTaskView(view: String, fullClassName: String)
+
 @sfxml
-class UIController(private val serviceTaskListView: ListView[String],
+class UIController(private val serviceTaskListView: ListView[ServiceTaskView],
                    private val actInstanceHITableView: TableView[FlowableActInstHistoricRecord],
                    private val actInstHi_idColumn: TableColumn[FlowableActInstHistoricRecord, String],
                    private val actInstHi_revColumn: TableColumn[FlowableActInstHistoricRecord, Int],
@@ -106,14 +108,28 @@ class UIController(private val serviceTaskListView: ListView[String],
   taskTypes += "prefect/declare_alarm_state"
   taskTypeListView.items = taskTypes
 
-  val serviceTasks = ObservableBuffer("do_crossborder_communication")
-  serviceTasks += "ensure_presence_of_qualified_personnel"
-  serviceTasks += "ensure_presence_of_representative"
-  serviceTasks += "inform_technical_rescue_organisation_alert"
-  serviceTasks += "inform_technical_rescue_organisation_internal_plan"
-  serviceTasks += "keep_update_involved_personnel"
-  serviceTasks += "notify_competent_body_internal_plan"
-  serviceTasks += "prepare_tech_report"
+  serviceTaskListView.cellFactory = {
+    a: ListView[ServiceTaskView] => {
+      val cell = new ListCell[ServiceTaskView]
+      cell.item.onChange { (_, _, st) => {
+        if (st != null) {
+          cell.text = st.view
+        }
+      }
+      }
+
+      cell
+    }
+  }
+
+  val serviceTasks = ObservableBuffer(ServiceTaskView("do_crossborder_communication", "nettunit.handler.do_crossborder_communication"))
+  serviceTasks += ServiceTaskView("ensure_presence_of_qualified_personnel", "nettunit.handler.ensure_presence_of_qualified_personnel")
+  serviceTasks += ServiceTaskView("ensure_presence_of_representative", "nettunit.handler.ensure_presence_of_representative")
+  serviceTasks += ServiceTaskView("inform_technical_rescue_organisation_alert", "nettunit.handler.inform_technical_rescue_organisation_alert")
+  serviceTasks += ServiceTaskView("inform_technical_rescue_organisation_internal_plan", "nettunit.handler.inform_technical_rescue_organisation_internal_plan")
+  serviceTasks += ServiceTaskView("keep_update_involved_personnel", "nettunit.handler.keep_update_involved_personnel")
+  serviceTasks += ServiceTaskView("notify_competent_body_internal_plan", "nettunit.handler.notify_competent_body_internal_plan")
+  serviceTasks += ServiceTaskView("prepare_tech_report", "nettunit.handler.prepare_tech_report")
   serviceTaskListView.items = serviceTasks
 
   processDef_IDColumn.cellValueFactory = _.value.id
@@ -173,7 +189,6 @@ class UIController(private val serviceTaskListView: ListView[String],
 
   val login = ECOSUsers.davide_login
 
-
   private def imageFromResource(name: String) =
     new ImageView(new Image(getClass.getClassLoader.getResourceAsStream(name)))
 
@@ -204,7 +219,8 @@ class UIController(private val serviceTaskListView: ListView[String],
 
   @FXML private[nettunit] def onConvertGoalsToBPMN(event: ActionEvent): Unit = {
     val goals = new String(GoalSPECTextArea.getText.getBytes(), "UTF-8")
-    val resultApply = Http(s"http://$getMUSAAddress():$getMUSAAddressPort()/Goal2BPMN")
+    val connectionString=s"http://$getMUSAAddress:$getMUSAAddressPort/Goal2BPMN"
+    val resultApply = Http(connectionString)
       .header("Content-Type", "text/plain")
       .postData(goals)
       .asString
@@ -212,7 +228,8 @@ class UIController(private val serviceTaskListView: ListView[String],
   }
 
   @FXML private[nettunit] def onDeployProcessToFlowable(event: ActionEvent): Unit = {
-    val resultApply = Http(s"http://$getMUSAAddress():$getMUSAAddressPort()/Deploy")
+    val connectionString=s"http://$getMUSAAddress:$getMUSAAddressPort/Deploy"
+    val resultApply = Http(connectionString)
       .header("Content-Type", "text/xml")
       .postData(BPMNTextArea.getText)
       .asString
@@ -227,13 +244,17 @@ class UIController(private val serviceTaskListView: ListView[String],
 
     val taskType = taskTypeListView.getSelectionModel.getSelectedItems.get(0)
     val taskID = taskIDTextField.getText
-    val requestString = s"http://$getFlowableAddress():$getFlowableAddressPort()/NETTUNIT/$taskType/$taskID"
-    val resultApply = Http(requestString).postData("").asString
-    new Alert(AlertType.Information, s"Result: ${
-      resultApply.statusLine
-    }").showAndWait()
+    val requestString = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/$taskType/$taskID"
 
-    updateProcessImageView()
+    try {
+      val resultApply = Http(requestString).postData("").asString
+      new Alert(AlertType.Information, s"Result: ${
+        resultApply.statusLine
+      }").showAndWait()
+      updateProcessImageView()
+    } catch {
+      case _: SocketTimeoutException =>  new Alert(AlertType.Error, s"Socket timeout").showAndWait()
+    }
   }
 
   @FXML private[nettunit] def failTask(event: ActionEvent): Unit = {
@@ -242,7 +263,7 @@ class UIController(private val serviceTaskListView: ListView[String],
 
   @FXML private[nettunit] def updateProcessQueryView(event: ActionEvent): Unit = {
     try {
-      val resultApply = Http(s"http://$getFlowableAddress():$getFlowableAddressPort()/NETTUNIT/incident_list/").method("GET").asString
+      val resultApply = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/incident_list/").method("GET").asString
       activePlansTextArea.setText(resultApply.body)
 
       if (activePlansTextArea.getText == "[]") {
@@ -250,7 +271,7 @@ class UIController(private val serviceTaskListView: ListView[String],
       }
 
       if (!processIDTextField.getText.isEmpty) {
-        val resultApply2 = Http(s"http://$getFlowableAddress():$getFlowableAddressPort()/NETTUNIT/task_list/${processIDTextField.getText}").method("GET").asString
+        val resultApply2 = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/task_list/${processIDTextField.getText}").method("GET").asString
         activeTasksTextArea.setText(resultApply2.body)
       }
     } catch {
@@ -258,12 +279,12 @@ class UIController(private val serviceTaskListView: ListView[String],
     }
   }
 
-  private def getFlowableAddress(): String = flowablePortTextField.getText match {
+  private def getFlowableAddressPort(): String = flowablePortTextField.getText match {
     case ad if ad.isEmpty => flowablePortTextField.getPromptText
     case _ => flowablePortTextField.getText
   }
 
-  private def getFlowableAddressPort(): String = flowableAddressTextField.getText match {
+  private def getFlowableAddress(): String = flowableAddressTextField.getText match {
     case ad if ad.isEmpty => flowableAddressTextField.getPromptText
     case _ => flowableAddressTextField.getText
   }
@@ -312,8 +333,13 @@ class UIController(private val serviceTaskListView: ListView[String],
   }
 
   @FXML private[nettunit] def submitServiceTaskFailureButtonClick(event: ActionEvent): Unit = {
-
-    print("ok")
+    val serviceTask = serviceTaskListView.getSelectionModel.getSelectedItems.get(0)
+    val connectionURL = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/fail/${serviceTask.fullClassName}"
+    val resultApply = Http(connectionURL)
+      .header("Content-Type", "text/xml")
+      .postData("")
+      .asString
+    new Alert(AlertType.Information, s"Result: $resultApply.statusLine").showAndWait()
   }
 
   private def updateProcessImageView() = taskTypeListView.getSelectionModel.getSelectedItems.get(0) match {

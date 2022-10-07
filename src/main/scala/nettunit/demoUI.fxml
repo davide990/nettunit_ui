@@ -44,8 +44,10 @@
                         <Label layoutX="452.0" layoutY="31.0" text="BPMN process definition" />
                         <Button fx:id="convertGoalSPECButton" layoutX="377.0" layoutY="196.0" mnemonicParsing="false" onAction="#onConvertGoalsToBPMN" prefHeight="26.0" prefWidth="66.0" text="to BPMN" />
                         <Button fx:id="deployToFlowableButton" layoutX="552.0" layoutY="610.0" mnemonicParsing="false" onAction="#onDeployProcessToFlowable" prefHeight="26.0" prefWidth="282.0" text="Deploy Process to Flowable" />
-                        <TextField fx:id="MUSAAddressTextField" layoutX="552.0" layoutY="545.0" prefHeight="26.0" prefWidth="284.0" promptText="MUSA Address (default 'localhost')" />
-                        <TextField fx:id="MUSAPortTextField" layoutX="552.0" layoutY="577.0" prefHeight="26.0" prefWidth="282.0" promptText="MUSA Port (default 8081)" />
+                        <TextField fx:id="MUSAAddressTextField" layoutX="552.0" layoutY="545.0" prefHeight="26.0" prefWidth="284.0" promptText="localhost" />
+                        <TextField fx:id="MUSAPortTextField" layoutX="552.0" layoutY="577.0" prefHeight="26.0" prefWidth="282.0" promptText="8081" />
+                        <Label layoutX="466.0" layoutY="550.0" text="MUSA Address" />
+                        <Label layoutX="489.0" layoutY="582.0" text="MUSA Port" />
                      </children>
                   </AnchorPane>
               </content>
@@ -99,7 +101,7 @@
                         <Label layoutX="86.0" layoutY="124.0" text="Process ID" />
                         <TextField fx:id="taskIDTextField" layoutX="155.0" layoutY="337.0" prefHeight="26.0" prefWidth="677.0" promptText="something like ac1bff24-431a-11ed-b04d-76b363516a6f" />
                         <Label layoutX="54.0" layoutY="342.0" text="Human Task ID" />
-                        <Label layoutX="46.0" layoutY="267.0" text="Humam Task type" />
+                        <Label layoutX="46.0" layoutY="267.0" text="Human Task type" />
                         <ListView fx:id="taskTypeListView" layoutX="155.0" layoutY="264.0" prefHeight="67.0" prefWidth="676.0" />
                               <Label layoutX="14.0" layoutY="14.0" text="Active Emergency plans" />
                         <TextArea fx:id="activePlansTextArea" layoutX="153.0" layoutY="14.0" prefHeight="90.0" prefWidth="679.0" />
