@@ -16,6 +16,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
 import scalafx.scene.image.{Image, ImageView}
+import scalafx.scene.input.{Clipboard, ClipboardContent}
 import scalafx.scene.shape.Circle
 import scalafxml.core.macros.sfxml
 import scalaj.http.{Http, HttpResponse}
@@ -29,7 +30,9 @@ import scala.io.Source
 case class ServiceTaskView(view: String, fullClassName: String)
 
 @sfxml
-class UIController(private val submitServiceTaskFailureButton: Button,
+class UIController(private val flowableReadyProcessCheckBox: CheckBox,
+
+                   private val submitServiceTaskFailureButton: Button,
                    private val mareImageView: ImageView,
                    private val jixelImageView: ImageView,
                    private val nettunitHautImageView: ImageView,
@@ -176,42 +179,14 @@ class UIController(private val submitServiceTaskFailureButton: Button,
     a: ListView[ServiceTaskView] => {
       val cell = new ListCell[ServiceTaskView]
       cell.item.onChange { (a, b, newValue) => {
-
-
         if (newValue != null) {
           cell.text = newValue.view
-          /*if (failingTaskName.isDefined) {
-            if (newValue.view == failingTaskName.get.view) {
-              cell.setStyle("-fx-background-color: darkred;-fx-text-fill: white;")
-            }
-          }*/
         }
       }
       }
-
       cell
     }
   }
-
-  /*
-    serviceTaskListView.cellFactory = {
-      a: ListView[ServiceTaskView] => {
-        val cell = new ListCell[ServiceTaskView]
-        cell.item.onChange { (a, b, newValue) => {
-          if (newValue != null) {
-            cell.text = newValue.view
-            if (failingTaskName.isDefined) {
-              if (newValue.view == failingTaskName.get.view) {
-                cell.setStyle("-fx-background-color: darkred;-fx-text-fill: white;")
-              }
-            }
-          }
-        }
-        }
-
-        cell
-      }
-    }*/
 
   processDef_IDColumn.cellValueFactory = _.value.id
   processDef_RevColumn.cellValueFactory = _.value.rev
@@ -279,6 +254,11 @@ class UIController(private val submitServiceTaskFailureButton: Button,
 
   var failingTaskName: Option[ServiceTaskView] = None
 
+  //String containing the BPMN string
+  var flowableReadyBPMNString = ""
+  //String containing the BPMN string modified to be as graphical bpmn into eclipse with flowable plugin editor
+  var eclipseBPMNEditorReadyBPMNString = ""
+
   sendTeamImage.setVisible(false)
   activateInternalPlanImage.setVisible(false)
   InformRescueInternalPlanImage.setVisible(false)
@@ -331,7 +311,18 @@ class UIController(private val submitServiceTaskFailureButton: Button,
       .header("Content-Type", "text/plain")
       .postData(goals)
       .asString
-    BPMNTextArea.setText(resultApply.body)
+
+    flowableReadyBPMNString = resultApply.body
+    eclipseBPMNEditorReadyBPMNString = resultApply.body
+    eclipseBPMNEditorReadyBPMNString = eclipseBPMNEditorReadyBPMNString.replace("flowable:executionListener", "activiti:executionListener")
+    eclipseBPMNEditorReadyBPMNString = eclipseBPMNEditorReadyBPMNString.replace("flowable:class", "activiti:class")
+
+    flowableReadyProcessCheckBox.isSelected match {
+      case true => BPMNTextArea.setText(flowableReadyBPMNString)
+      case false => BPMNTextArea.setText(eclipseBPMNEditorReadyBPMNString)
+    }
+    //BPMNTextArea.setText(resultApply.body)
+
   }
 
   @FXML private[nettunit] def onDeployProcessToFlowable(event: ActionEvent): Unit = {
@@ -648,6 +639,24 @@ class UIController(private val submitServiceTaskFailureButton: Button,
 
 
   }
+
+  @FXML private[nettunit] def copyProcessToClipboardButtonClick(event: ActionEvent): Unit = {
+    val clipboard = Clipboard.systemClipboard
+    val content = new ClipboardContent
+    content.putString(BPMNTextArea.getText)
+    clipboard.setContent(content)
+  }
+
+  @FXML private[nettunit] def onFlowableReadyCheckboxChanged(event: ActionEvent): Unit = flowableReadyProcessCheckBox.isSelected match {
+    case true => {
+      deployToFlowableButton.setDisable(false)
+      BPMNTextArea.setText(flowableReadyBPMNString)
+    }
+    case false =>
+      BPMNTextArea.setText(eclipseBPMNEditorReadyBPMNString)
+      deployToFlowableButton.setDisable(true)
+  }
+
 
 }
 

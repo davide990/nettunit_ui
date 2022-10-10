@@ -3,6 +3,7 @@
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
@@ -28,6 +29,36 @@
    <children>
       <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="694.0" prefWidth="850.0" tabClosingPolicy="UNAVAILABLE">
           <tabs>
+            <Tab text="NETTUNIT">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: white;">
+                     <children>
+                        <ImageView fx:id="nettunitHautImageView" fitHeight="399.0" fitWidth="552.0" layoutX="159.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../resources/banners/nettunitHaut.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="mareImageView" fitHeight="214.0" fitWidth="850.0" layoutY="447.0" pickOnBounds="true">
+                           <image>
+                              <Image url="@../../resources/banners/slide-1.1.png" />
+                           </image>
+                        </ImageView>
+                        <Label layoutX="182.0" layoutY="216.0" prefHeight="171.0" prefWidth="486.0" style="-fx-background-color: rgba(0, 0, 0, 0)rgba(0, 0, 0, 0);" text="Le projet NETTUNIT vise à développer une plateforme complètement opérationnelle avec l’utilisation des alertes météorologiques, des alertes sur la pollution atmosphériques et la pollution marine destinées en particulier aux services de la Protection Civile, aux services de la santé locale et autres services d’intervention Italiens et Tunisien afin de collaborer ensemble pour une éventuelle intervention." textAlignment="JUSTIFY" wrapText="true" />
+                        <VBox layoutX="182.0" layoutY="379.0" prefHeight="177.0" prefWidth="552.0" spacing="8.0">
+                           <children>
+                              <Label text="Ce prototype a été développé par Davide Andrea Guastella (ICAR-CNR)" />
+                              <Label text="MUSA a été conçu et développé par Luca Sabatucci (ICAR-CNR) et Massimo Cossentino (ICAR-CNR)" />
+                              <Label text="JIXEL est un produit de IES Solutions SRL" />
+                              <Label text="Les icones utilisées dans le processus ont été réalisé par:" />
+                              <Label text="- Aldo Cervantes - Flaticon" />
+                              <Label text="- Freepik - Flaticon" />
+                              <Label text="- azmianshori - Flaticon" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
               <Tab text="Apply emergency plan">
                   <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
@@ -74,24 +105,26 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <Label layoutX="14.0" layoutY="31.0" text="Write your GoalSPEC definition here" />
-                        <TextArea fx:id="GoalSPECTextArea" layoutX="14.0" layoutY="52.0" prefHeight="473.0" prefWidth="332.0" promptText="Hello" text="GOAL Managing_emergency IS AND OF {&#10;&#10;GOAL send_team_to_evaluate : WHEN emergency_location(refinery) AND NOT assessed_emergency THEN THE safety_manager ROLE SHALL ADDRESS FINALLY alarm_state(attention)&#10;&#10;GOAL activate_internal_security_plan : WHEN alarm_state(attention) THEN THE plant_operator ROLE SHALL ADDRESS FINALLY internal_plan_active(active)&#10;&#10;GOAL notify_competent_body_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(prefect, attention) AND informed_authority(mayor, attention)&#10;&#10;GOAL inform_technical_rescue_organisation_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(commander_fire_brigade,attention)&#10;&#10;GOAL decide_response_type : WHEN informed(commander_fire_brigade, attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY fire_brigade_assessment_done(attention)&#10;&#10;GOAL prepare_tech_report : WHEN fire_brigade_assessment_done(attention) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY tech_report(fire,attention)&#10;&#10;GOAL keep_update_involved_personnel : WHEN tech_report(fire,attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY coordinated_firefighter_intervention AND second_explosion&#10;&#10;GOAL declare_pre_alert_state : WHEN coordinated_firefighter_intervention AND second_explosion THEN THE nettunit ROLE SHALL ADDRESS FINALLY alarm_state(pre_alert)&#10;&#10;GOAL inform_technical_rescue_organisation_alert : WHEN alarm_state(pre_alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(n118, pre_alert) AND informed(ASP, pre_alert) AND informed(ARPA, pre_alert)&#10;&#10;GOAL evaluate_fire_radiant_energy : WHEN informed(ARPA, pre_alert) AND alarm_state(pre_alert) THEN THE ARPA ROLE SHALL ADDRESS FINALLY evaluated_fire_radiant_energy&#10;&#10;GOAL declare_alarm_state : WHEN evaluated_fire_radiant_energy AND alarm_state(pre_alert) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY alarm_state(alert)&#10;&#10;GOAL ensure_presence_of_qualified_personnel : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(civil_protection,alert) AND informed_authority(municipality, alert)&#10;&#10;GOAL ensure_presence_of_representative : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(questor, alert)&#10;&#10;GOAL do_crossborder_communication : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY crossborder_inform&#10;}">
+                        <TextArea fx:id="GoalSPECTextArea" layoutX="14.0" layoutY="52.0" prefHeight="481.0" prefWidth="332.0" promptText="Hello" text="GOAL Managing_emergency IS AND OF {&#10;&#10;GOAL send_team_to_evaluate : WHEN emergency_location(refinery) AND NOT assessed_emergency THEN THE safety_manager ROLE SHALL ADDRESS FINALLY alarm_state(attention)&#10;&#10;GOAL activate_internal_security_plan : WHEN alarm_state(attention) THEN THE plant_operator ROLE SHALL ADDRESS FINALLY internal_plan_active(active)&#10;&#10;GOAL notify_competent_body_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(prefect, attention) AND informed_authority(mayor, attention)&#10;&#10;GOAL inform_technical_rescue_organisation_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(commander_fire_brigade,attention)&#10;&#10;GOAL decide_response_type : WHEN informed(commander_fire_brigade, attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY fire_brigade_assessment_done(attention)&#10;&#10;GOAL prepare_tech_report : WHEN fire_brigade_assessment_done(attention) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY tech_report(fire,attention)&#10;&#10;GOAL keep_update_involved_personnel : WHEN tech_report(fire,attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY coordinated_firefighter_intervention AND second_explosion&#10;&#10;GOAL declare_pre_alert_state : WHEN coordinated_firefighter_intervention AND second_explosion THEN THE nettunit ROLE SHALL ADDRESS FINALLY alarm_state(pre_alert)&#10;&#10;GOAL inform_technical_rescue_organisation_alert : WHEN alarm_state(pre_alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(n118, pre_alert) AND informed(ASP, pre_alert) AND informed(ARPA, pre_alert)&#10;&#10;GOAL evaluate_fire_radiant_energy : WHEN informed(ARPA, pre_alert) AND alarm_state(pre_alert) THEN THE ARPA ROLE SHALL ADDRESS FINALLY evaluated_fire_radiant_energy&#10;&#10;GOAL declare_alarm_state : WHEN evaluated_fire_radiant_energy AND alarm_state(pre_alert) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY alarm_state(alert)&#10;&#10;GOAL ensure_presence_of_qualified_personnel : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(civil_protection,alert) AND informed_authority(municipality, alert)&#10;&#10;GOAL ensure_presence_of_representative : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(questor, alert)&#10;&#10;GOAL do_crossborder_communication : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY crossborder_inform&#10;}">
                            <font>
                               <Font name="Monaco" size="10.0" />
                            </font>
                         </TextArea>
-                        <TextArea fx:id="BPMNTextArea" layoutX="466.0" layoutY="48.0" prefHeight="476.0" prefWidth="370.0">
+                        <TextArea fx:id="BPMNTextArea" layoutX="466.0" layoutY="48.0" prefHeight="482.0" prefWidth="370.0">
                            <font>
                               <Font name="Courier New" size="12.0" />
                            </font>
                         </TextArea>
                         <Label layoutX="466.0" layoutY="31.0" text="BPMN process definition" />
                         <Button fx:id="convertGoalSPECButton" layoutX="352.0" layoutY="195.0" mnemonicParsing="false" onAction="#onConvertGoalsToBPMN" prefHeight="46.0" prefWidth="107.0" text="Orchestrate solution" textAlignment="CENTER" wrapText="true" />
-                        <Button fx:id="deployToFlowableButton" layoutX="552.0" layoutY="590.0" mnemonicParsing="false" onAction="#onDeployProcessToFlowable" prefHeight="26.0" prefWidth="282.0" text="Deploy Process to Flowable" />
-                        <TextField fx:id="MUSAAddressTextField" layoutX="552.0" layoutY="525.0" prefHeight="26.0" prefWidth="284.0" promptText="localhost" />
-                        <TextField fx:id="MUSAPortTextField" layoutX="552.0" layoutY="557.0" prefHeight="26.0" prefWidth="282.0" promptText="8081" />
-                        <Label layoutX="466.0" layoutY="530.0" text="MUSA Address" />
-                        <Label layoutX="489.0" layoutY="562.0" text="MUSA Port" />
-                        <Button layoutX="550.0" layoutY="624.0" mnemonicParsing="false" onAction="#clearProcessDefButtonClick" prefHeight="26.0" prefWidth="286.0" style="-fx-background-color: darkred;" text="Clear previous process definitions" textFill="WHITE" />
+                        <Button fx:id="deployToFlowableButton" layoutX="552.0" layoutY="595.0" mnemonicParsing="false" onAction="#onDeployProcessToFlowable" prefHeight="26.0" prefWidth="282.0" text="Deploy Process to Flowable" />
+                        <TextField fx:id="MUSAAddressTextField" layoutX="259.0" layoutY="595.0" prefHeight="26.0" prefWidth="284.0" promptText="localhost" />
+                        <TextField fx:id="MUSAPortTextField" layoutX="259.0" layoutY="627.0" prefHeight="26.0" prefWidth="282.0" promptText="8081" />
+                        <Label layoutX="173.0" layoutY="600.0" text="MUSA Address" />
+                        <Label layoutX="196.0" layoutY="632.0" text="MUSA Port" />
+                        <Button layoutX="550.0" layoutY="627.0" mnemonicParsing="false" onAction="#clearProcessDefButtonClick" prefHeight="26.0" prefWidth="286.0" style="-fx-background-color: darkred;" text="Clear previous process definitions" textFill="WHITE" />
+                        <Button layoutX="552.0" layoutY="562.0" mnemonicParsing="false" onAction="#copyProcessToClipboardButtonClick" prefHeight="26.0" prefWidth="280.0" text="Copy BPMN to clipboard" />
+                        <CheckBox fx:id="flowableReadyProcessCheckBox" layoutX="546.0" layoutY="538.0" mnemonicParsing="false" onAction="#onFlowableReadyCheckboxChanged" selected="true" text="Flowable-ready" />
                      </children>
                   </AnchorPane>
               </content>
@@ -355,36 +388,6 @@
                               </TitledPane>
                           </panes>
                         </Accordion>
-                     </children>
-                  </AnchorPane>
-              </content>
-            </Tab>
-            <Tab text="NETTUNIT">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: white;">
-                     <children>
-                        <ImageView fx:id="nettunitHautImageView" fitHeight="399.0" fitWidth="552.0" layoutX="159.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../resources/banners/nettunitHaut.png" />
-                           </image>
-                        </ImageView>
-                        <ImageView fx:id="mareImageView" fitHeight="214.0" fitWidth="850.0" layoutY="447.0" pickOnBounds="true">
-                           <image>
-                              <Image url="@../../resources/banners/slide-1.1.png" />
-                           </image>
-                        </ImageView>
-                        <Label layoutX="182.0" layoutY="216.0" prefHeight="171.0" prefWidth="486.0" style="-fx-background-color: rgba(0, 0, 0, 0)rgba(0, 0, 0, 0);" text="Le projet NETTUNIT vise à développer une plateforme complètement opérationnelle avec l’utilisation des alertes météorologiques, des alertes sur la pollution atmosphériques et la pollution marine destinées en particulier aux services de la Protection Civile, aux services de la santé locale et autres services d’intervention Italiens et Tunisien afin de collaborer ensemble pour une éventuelle intervention." textAlignment="JUSTIFY" wrapText="true" />
-                        <VBox layoutX="182.0" layoutY="379.0" prefHeight="177.0" prefWidth="552.0" spacing="8.0">
-                           <children>
-                              <Label text="Ce prototype a été développé par Davide Andrea Guastella (ICAR-CNR)" />
-                              <Label text="MUSA a été conçu et développé par Luca Sabatucci (ICAR-CNR) et Massimo Cossentino (ICAR-CNR)" />
-                              <Label text="JIXEL est un produit de IES Solutions SRL" />
-                              <Label text="Les icones utilisées dans le processus ont été réalisé par:" />
-                              <Label text="- Aldo Cervantes - Flaticon" />
-                              <Label text="- Freepik - Flaticon" />
-                              <Label text="- azmianshori - Flaticon" />
-                           </children>
-                        </VBox>
                      </children>
                   </AnchorPane>
               </content>
