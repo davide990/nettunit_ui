@@ -5,6 +5,7 @@ import JixelAPIInterface.Login.ECOSUsers
 import RabbitMQ.Launchers.Jixel.JixelClientTest.jixel
 import RabbitMQ.Producer.JixelRabbitMQProducer
 import Utils.JixelUtil
+import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.collections.{FXCollections, ObservableList}
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
@@ -17,7 +18,7 @@ import scalafx.scene.control._
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.shape.Circle
 import scalafxml.core.macros.sfxml
-import scalaj.http.Http
+import scalaj.http.{Http, HttpResponse}
 
 import java.io.{File, FileInputStream}
 import java.net.{ConnectException, SocketTimeoutException}
@@ -28,9 +29,11 @@ import scala.io.Source
 case class ServiceTaskView(view: String, fullClassName: String)
 
 @sfxml
-class UIController(private val mareImageView: ImageView,
+class UIController(private val submitServiceTaskFailureButton: Button,
+                   private val mareImageView: ImageView,
                    private val jixelImageView: ImageView,
-                   private val nettunitHautImageView:ImageView,
+                   private val nettunitHautImageView: ImageView,
+
                    private val do_crossborder_communication_circle: Circle,
                    private val ensure_presence_of_qualified_personnel_circle: Circle,
                    private val ensure_presence_of_representative_circle: Circle,
@@ -137,25 +140,6 @@ class UIController(private val mareImageView: ImageView,
   taskTypes += "prefect/declare_alarm_state"
   taskTypeListView.items = taskTypes
 
-  serviceTaskListView.cellFactory = {
-    a: ListView[ServiceTaskView] => {
-      val cell = new ListCell[ServiceTaskView]
-      cell.item.onChange { (_, _, st) => {
-        if (st != null) {
-          cell.text = st.view
-          if (failingTaskName.isDefined) {
-            if (st.view == failingTaskName.get) {
-              cell.setStyle("-fx-background-color: darkred;-fx-text-fill: white;")
-            }
-          }
-        }
-      }
-      }
-
-      cell
-    }
-  }
-
   val serviceTasks = ObservableBuffer(ServiceTaskView("do_crossborder_communication", "nettunit.handler.do_crossborder_communication"))
   serviceTasks += ServiceTaskView("ensure_presence_of_qualified_personnel", "nettunit.handler.ensure_presence_of_qualified_personnel")
   serviceTasks += ServiceTaskView("ensure_presence_of_representative", "nettunit.handler.ensure_presence_of_representative")
@@ -165,6 +149,69 @@ class UIController(private val mareImageView: ImageView,
   serviceTasks += ServiceTaskView("notify_competent_body_internal_plan", "nettunit.handler.notify_competent_body_internal_plan")
   serviceTasks += ServiceTaskView("prepare_tech_report", "nettunit.handler.prepare_tech_report")
   serviceTaskListView.items = serviceTasks
+
+  private val SUBMIT_SERVICE_TASK_RESTORE = "Restore activity"
+  private val SUBMIT_SERVICE_TASK_FAIL = "Submit failure request"
+
+  serviceTaskListView.getSelectionModel.selectedItemProperty().addListener(new ChangeListener[ServiceTaskView] {
+    override def changed(observableValue: ObservableValue[_ <: ServiceTaskView], oldValue: ServiceTaskView, newValue: ServiceTaskView): Unit = {
+      setFailActivityButtonStatus(newValue)
+    }
+  })
+
+  private def setFailActivityButtonStatus(selectedView: ServiceTaskView): Unit = {
+    if (failingTaskName.isDefined) {
+      if (selectedView.view == failingTaskName.get.view) {
+        submitServiceTaskFailureButton.setText(SUBMIT_SERVICE_TASK_RESTORE)
+        submitServiceTaskFailureButton.setStyle("-fx-background-color: darkgreen;-fx-text-fill: white;")
+        return
+      }
+    }
+    submitServiceTaskFailureButton.setText(SUBMIT_SERVICE_TASK_FAIL)
+    submitServiceTaskFailureButton.setStyle("-fx-background-color: darkred;-fx-text-fill: white;")
+
+  }
+
+  serviceTaskListView.cellFactory = {
+    a: ListView[ServiceTaskView] => {
+      val cell = new ListCell[ServiceTaskView]
+      cell.item.onChange { (a, b, newValue) => {
+
+
+        if (newValue != null) {
+          cell.text = newValue.view
+          /*if (failingTaskName.isDefined) {
+            if (newValue.view == failingTaskName.get.view) {
+              cell.setStyle("-fx-background-color: darkred;-fx-text-fill: white;")
+            }
+          }*/
+        }
+      }
+      }
+
+      cell
+    }
+  }
+
+  /*
+    serviceTaskListView.cellFactory = {
+      a: ListView[ServiceTaskView] => {
+        val cell = new ListCell[ServiceTaskView]
+        cell.item.onChange { (a, b, newValue) => {
+          if (newValue != null) {
+            cell.text = newValue.view
+            if (failingTaskName.isDefined) {
+              if (newValue.view == failingTaskName.get.view) {
+                cell.setStyle("-fx-background-color: darkred;-fx-text-fill: white;")
+              }
+            }
+          }
+        }
+        }
+
+        cell
+      }
+    }*/
 
   processDef_IDColumn.cellValueFactory = _.value.id
   processDef_RevColumn.cellValueFactory = _.value.rev
@@ -230,7 +277,7 @@ class UIController(private val mareImageView: ImageView,
   val pendingIcon = new Image(new FileInputStream(pendingIconFile))
   val warningIcon = new Image(new FileInputStream(warningIconFile))
 
-  var failingTaskName: Option[String] = None
+  var failingTaskName: Option[ServiceTaskView] = None
 
   sendTeamImage.setVisible(false)
   activateInternalPlanImage.setVisible(false)
@@ -247,17 +294,6 @@ class UIController(private val mareImageView: ImageView,
   doCrossBorderImage.setVisible(false)
   ensureQualifiedPersonnelImage.setVisible(false)
   adaptationTaskImage.setVisible(false)
-
-  val processStatusIdle = getClass.getResource("/infographic-1.png").getFile
-  val processsSendTeamIdle = getClass.getResource("/infographic-2.png").getFile
-  val processActivateInternalPlanIdle = getClass.getResource("/infographic-3.png").getFile
-  val processDecideResponsePlanIdle = getClass.getResource("/infographic-4.png").getFile
-  val processDeclarePreAlertIdle = getClass.getResource("/infographic-5.png").getFile
-  val processEvaluateFireRadiantEnIdle = getClass.getResource("/infographic-6.png").getFile
-  val processDeclareAlarmIdle = getClass.getResource("/infographic-7.png").getFile
-  val processComplete = getClass.getResource("/infographic-8.png").getFile
-
-
 
   val login = ECOSUsers.davide_login
 
@@ -281,7 +317,6 @@ class UIController(private val mareImageView: ImageView,
         .postData(body)
         .header("Content-Type", "application/json").asString
       new Alert(AlertType.Information, s"Success").showAndWait()
-      processImageView.setImage(new Image(new FileInputStream(processsSendTeamIdle)))
     } catch {
       case _: ConnectException => new Alert(AlertType.Error, s"unable to connect. Please check if flowable is active").showAndWait()
     }
@@ -340,7 +375,29 @@ class UIController(private val mareImageView: ImageView,
       activePlansTextArea.setText(resultApply.body)
 
       if (activePlansTextArea.getText == "[]") {
-        processImageView.setImage(new Image(new FileInputStream(processStatusIdle)))
+        do_crossborder_communication_circle.setVisible(false)
+        ensure_presence_of_qualified_personnel_circle.setVisible(false)
+        ensure_presence_of_representative_circle.setVisible(false)
+        inform_technical_rescue_organisation_alert_circle.setVisible(false)
+        inform_technical_rescue_organisation_internal_plan_circle.setVisible(false)
+        keep_update_involved_personnel_circle.setVisible(false)
+        notify_competent_body_internal_plan_circle.setVisible(false)
+        prepare_tech_report_circle.setVisible(false)
+        sendTeamImage.setVisible(false)
+        activateInternalPlanImage.setVisible(false)
+        InformRescueInternalPlanImage.setVisible(false)
+        decideResponseTypeImage.setVisible(false)
+        prepareReportImage.setVisible(false)
+        keepUpdateImage.setVisible(false)
+        declarePreAlertImage.setVisible(false)
+        informRescueAlertImage.setVisible(false)
+        evaluateFireRadiantImage.setVisible(false)
+        declareAlarmImage.setVisible(false)
+        notifyCompetentBodiesImage.setVisible(false)
+        ensurePresenceImage.setVisible(false)
+        doCrossBorderImage.setVisible(false)
+        ensureQualifiedPersonnelImage.setVisible(false)
+        adaptationTaskImage.setVisible(false)
       }
 
       if (!processIDTextField.getText.isEmpty) {
@@ -410,25 +467,42 @@ class UIController(private val mareImageView: ImageView,
   @FXML private[nettunit] def submitServiceTaskFailureButtonClick(event: ActionEvent): Unit = {
     val serviceTask = serviceTaskListView.getSelectionModel.getSelectedItems.get(0)
 
-    failingTaskName = Some(serviceTask.view)
-
+    failingTaskName.isDefined match {
+      case true =>
+        if (serviceTask.view == failingTaskName.get.view) {
+          submitUndoServiceTaskFailure(serviceTask)
+          new Alert(AlertType.Information, s"Submitted failure request for task: ${serviceTask.view}").showAndWait()
+        } else {
+          //undo previous task failure request
+          submitUndoServiceTaskFailure(failingTaskName.get)
+          //request a new failure for selected task
+          submitServiceTaskFailure(serviceTask)
+          new Alert(AlertType.Information, s"Submitted failure request for task: ${serviceTask.view}").showAndWait()
+        }
+      case false =>
+        val result = submitServiceTaskFailure(serviceTask)
+        new Alert(AlertType.Information, s"Submitted failure request for task: ${serviceTask.view}").showAndWait()
+    }
     serviceTaskListView.refresh()
+    setFailActivityButtonStatus(serviceTask)
+  }
 
-    val connectionURL = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/fail/${serviceTask.fullClassName}"
-    val resultApply = Http(connectionURL)
+  def submitUndoServiceTaskFailure(service: ServiceTaskView): HttpResponse[String] = {
+    failingTaskName = Some(service)
+    val connectionURL = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/undo_fail/${service.fullClassName}"
+    Http(connectionURL)
       .header("Content-Type", "text/xml")
       .postData("")
       .asString
-    new Alert(AlertType.Information, s"Result: $resultApply.statusLine").showAndWait()
   }
 
-  private def updateProcessImageView() = taskTypeListView.getSelectionModel.getSelectedItems.get(0) match {
-    case "safety_manager/send_team_to_evaluate" => processImageView.setImage(new Image(new FileInputStream(processActivateInternalPlanIdle)))
-    case "plant_operator/activate_internal_security_plan" => processImageView.setImage(new Image(new FileInputStream(processDecideResponsePlanIdle)))
-    case "commander_fire_brigade/decide_response_type" => processImageView.setImage(new Image(new FileInputStream(processDeclarePreAlertIdle)))
-    case "prefect/declare_pre_alert_state" => processImageView.setImage(new Image(new FileInputStream(processEvaluateFireRadiantEnIdle)))
-    case "ARPA/evaluate_fire_radiant_energy" => processImageView.setImage(new Image(new FileInputStream(processDeclareAlarmIdle)))
-    case "prefect/declare_alarm_state" => processImageView.setImage(new Image(new FileInputStream(processComplete)))
+  def submitServiceTaskFailure(service: ServiceTaskView): HttpResponse[String] = {
+    failingTaskName = Some(service)
+    val connectionURL = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/fail/${service.fullClassName}"
+    Http(connectionURL)
+      .header("Content-Type", "text/xml")
+      .postData("")
+      .asString
   }
 
   private def updateAdaptationTaskImageView(): Unit = {
@@ -509,8 +583,7 @@ class UIController(private val mareImageView: ImageView,
       declareAlarmImage.setImage(pendingIcon)
     }
     case "prefect/declare_alarm_state" => {
-      processImageView.setImage(new Image(new FileInputStream(processComplete)))
-
+      declareAlarmImage.setImage(acceptHumanIcon)
       isFailingTask("notify_competent_body_internal_plan") match {
         case true =>
           notifyCompetentBodiesImage.setImage(warningIcon)
@@ -549,6 +622,32 @@ class UIController(private val mareImageView: ImageView,
 
   /**/
 
+  @FXML private[nettunit] def clearProcessDefButtonClick(event: ActionEvent): Unit = {
+    // Create and show confirmation alert
+    val alert = new Alert(AlertType.Confirmation) {
+      title = "Confirmation Dialog"
+      headerText = "Delete all previous process definitions."
+      contentText = "Are you ok with this?"
+    }
+
+    val result = alert.showAndWait()
+
+    // React to user's selectioon
+    result match {
+      case Some(ButtonType.OK) => {
+        val connectionURL = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/clearDeployments/"
+        val resultApply = Http(connectionURL)
+          .header("Content-Type", "text/xml")
+          .postData("")
+          .asString
+
+        new Alert(AlertType.Information, s"All done.").showAndWait()
+      }
+      case _ =>
+    }
+
+
+  }
 
 }
 
