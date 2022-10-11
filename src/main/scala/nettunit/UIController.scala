@@ -29,8 +29,13 @@ import scala.io.Source
 
 case class ServiceTaskView(view: String, fullClassName: String)
 
+case class UserTaskDetail (taskID: String, taskName: String, processID: String, taskData:Map[String, Object])
+
+
 @sfxml
-class UIController(private val flowableReadyProcessCheckBox: CheckBox,
+class UIController(private val activePlansListView: ListView[String],
+                   private val activeTasksListView: ListView[String],
+                    private val flowableReadyProcessCheckBox: CheckBox,
 
                    private val submitServiceTaskFailureButton: Button,
                    private val mareImageView: ImageView,
@@ -365,6 +370,20 @@ class UIController(private val flowableReadyProcessCheckBox: CheckBox,
       val resultApply = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/incident_list/").method("GET").asString
       activePlansTextArea.setText(resultApply.body)
 
+      if (resultApply.body != "[]"){
+        val strings = resultApply.body.substring(1,resultApply.body.length-1)
+        //val processID = strings.replace('"',' ').split(",")
+        val processID =strings.filter(!"\"".contains(_)).split(',')
+        activePlansListView.getItems.clear()
+        processID.foreach(pid => activePlansListView.getItems.add(pid))
+
+
+      }
+
+
+//val a = resultApply.sub
+
+      //da eliminare se non si usa l'immagine
       if (activePlansTextArea.getText == "[]") {
         do_crossborder_communication_circle.setVisible(false)
         ensure_presence_of_qualified_personnel_circle.setVisible(false)

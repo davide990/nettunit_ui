@@ -137,15 +137,15 @@
                               <Button fx:id="updateViewQueryButton" layoutX="743.0" layoutY="222.0" mnemonicParsing="false" onAction="#updateProcessQueryView" text="Update View" />
                               <Button fx:id="completeTaskButton" layoutX="687.0" layoutY="378.0" mnemonicParsing="false" onAction="#completeTask" style="-fx-background-color: darkgreen;" text="Complete HumanTask" textFill="WHITE" textOverrun="CLIP" />
                               <Button fx:id="failTaskButton" layoutX="532.0" layoutY="378.0" mnemonicParsing="false" onAction="#failTask" prefHeight="26.0" prefWidth="146.0" style="-fx-background-color: darkred;" text="Fail Human Task" textFill="WHITE" />
-                        <TextArea fx:id="activeTasksTextArea" layoutX="153.0" layoutY="158.0" prefHeight="64.0" prefWidth="677.0" />
-                        <TextField fx:id="processIDTextField" layoutX="153.0" layoutY="119.0" prefHeight="26.0" prefWidth="678.0" />
+                        <TextArea fx:id="activeTasksTextArea" layoutX="153.0" layoutY="158.0" prefHeight="64.0" prefWidth="440.0" />
+                        <TextField fx:id="processIDTextField" layoutX="153.0" layoutY="119.0" prefHeight="26.0" prefWidth="442.0" />
                         <Label layoutX="86.0" layoutY="124.0" text="Process ID" />
-                        <TextField fx:id="taskIDTextField" layoutX="155.0" layoutY="337.0" prefHeight="26.0" prefWidth="677.0" promptText="something like ac1bff24-431a-11ed-b04d-76b363516a6f" />
+                        <TextField fx:id="taskIDTextField" layoutX="155.0" layoutY="337.0" prefHeight="26.0" prefWidth="438.0" promptText="something like ac1bff24-431a-11ed-b04d-76b363516a6f" />
                         <Label layoutX="54.0" layoutY="342.0" text="Human Task ID" />
                         <Label layoutX="46.0" layoutY="267.0" text="Human Task type" />
-                        <ListView fx:id="taskTypeListView" layoutX="155.0" layoutY="264.0" prefHeight="67.0" prefWidth="676.0" />
+                        <ListView fx:id="taskTypeListView" layoutX="155.0" layoutY="264.0" prefHeight="67.0" prefWidth="438.0" />
                               <Label layoutX="14.0" layoutY="14.0" text="Active Emergency plans" />
-                        <TextArea fx:id="activePlansTextArea" layoutX="153.0" layoutY="14.0" prefHeight="90.0" prefWidth="679.0" />
+                        <TextArea fx:id="activePlansTextArea" layoutX="153.0" layoutY="14.0" prefHeight="90.0" prefWidth="448.0" />
                         <Separator layoutX="155.0" layoutY="248.0" prefHeight="16.0" prefWidth="675.0" />
                         <TabPane layoutX="5.0" layoutY="418.0" prefHeight="238.0" prefWidth="822.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
@@ -266,6 +266,8 @@
                             </Tab>
                           </tabs>
                         </TabPane>
+                        <ListView fx:id="activePlansListView" layoutX="605.0" layoutY="19.0" prefHeight="87.0" prefWidth="200.0" />
+                        <ListView fx:id="activeTasksListView" layoutX="609.0" layoutY="114.0" prefHeight="89.0" prefWidth="197.0" />
                           </children>
                       </AnchorPane>
                   </content>
