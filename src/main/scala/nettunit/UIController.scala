@@ -462,6 +462,7 @@ class UIController(private val flowableReadyProcessCheckBox: CheckBox,
       case true =>
         if (serviceTask.view == failingTaskName.get.view) {
           submitUndoServiceTaskFailure(serviceTask)
+          failingTaskName = None
           new Alert(AlertType.Information, s"Submitted failure request for task: ${serviceTask.view}").showAndWait()
         } else {
           //undo previous task failure request
