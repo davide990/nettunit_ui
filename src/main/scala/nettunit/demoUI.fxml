@@ -3,9 +3,9 @@
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
@@ -20,6 +20,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
@@ -43,16 +44,12 @@
                               <Image url="@../../resources/banners/slide-1.1.png" />
                            </image>
                         </ImageView>
-                        <Label layoutX="182.0" layoutY="216.0" prefHeight="171.0" prefWidth="486.0" style="-fx-background-color: rgba(0, 0, 0, 0)rgba(0, 0, 0, 0);" text="Le projet NETTUNIT vise à développer une plateforme complètement opérationnelle avec l’utilisation des alertes météorologiques, des alertes sur la pollution atmosphériques et la pollution marine destinées en particulier aux services de la Protection Civile, aux services de la santé locale et autres services d’intervention Italiens et Tunisien afin de collaborer ensemble pour une éventuelle intervention." textAlignment="JUSTIFY" wrapText="true" />
-                        <VBox layoutX="182.0" layoutY="379.0" prefHeight="177.0" prefWidth="552.0" spacing="8.0">
+                        <Label layoutX="182.0" layoutY="246.0" prefHeight="171.0" prefWidth="486.0" style="-fx-background-color: rgba(0, 0, 0, 0)rgba(0, 0, 0, 0);" text="Le projet NETTUNIT vise à développer une plateforme complètement opérationnelle avec l’utilisation des alertes météorologiques, des alertes sur la pollution atmosphériques et la pollution marine destinées en particulier aux services de la Protection Civile, aux services de la santé locale et autres services d’intervention Italiens et Tunisien afin de collaborer ensemble pour une éventuelle intervention." textAlignment="JUSTIFY" wrapText="true" />
+                        <VBox layoutX="182.0" layoutY="399.0" prefHeight="157.0" prefWidth="552.0" spacing="8.0">
                            <children>
                               <Label text="Ce prototype a été développé par Davide Andrea Guastella (ICAR-CNR)" />
                               <Label text="MUSA a été conçu et développé par Luca Sabatucci (ICAR-CNR) et Massimo Cossentino (ICAR-CNR)" />
                               <Label text="JIXEL est un produit de IES Solutions SRL" />
-                              <Label text="Les icones utilisées dans le processus ont été réalisé par:" />
-                              <Label text="- Aldo Cervantes - Flaticon" />
-                              <Label text="- Freepik - Flaticon" />
-                              <Label text="- azmianshori - Flaticon" />
                            </children>
                         </VBox>
                      </children>
@@ -69,7 +66,7 @@
                               <Font name="Monaco" size="10.0" />
                            </font>
                         </TextArea>
-                        <TextArea fx:id="BPMNTextArea" layoutX="466.0" layoutY="48.0" prefHeight="482.0" prefWidth="370.0">
+                        <TextArea fx:id="BPMNTextArea" layoutX="466.0" layoutY="48.0" prefHeight="447.0" prefWidth="370.0">
                            <font>
                               <Font name="Courier New" size="12.0" />
                            </font>
@@ -83,7 +80,13 @@
                         <Label layoutX="196.0" layoutY="632.0" text="MUSA Port" />
                         <Button layoutX="550.0" layoutY="627.0" mnemonicParsing="false" onAction="#clearProcessDefButtonClick" prefHeight="26.0" prefWidth="286.0" style="-fx-background-color: darkred;" text="Clear previous process definitions" textFill="WHITE" />
                         <Button layoutX="552.0" layoutY="562.0" mnemonicParsing="false" onAction="#copyProcessToClipboardButtonClick" prefHeight="26.0" prefWidth="280.0" text="Copy BPMN to clipboard" />
-                        <CheckBox fx:id="flowableReadyProcessCheckBox" layoutX="546.0" layoutY="538.0" mnemonicParsing="false" onAction="#onFlowableReadyCheckboxChanged" selected="true" text="Flowable-ready" />
+                        <HBox alignment="CENTER" layoutX="549.0" layoutY="530.0" prefHeight="28.0" prefWidth="280.0" spacing="50.0">
+                           <children>
+                              <RadioButton fx:id="flowableRadioButton" mnemonicParsing="false" onAction="#flowableRadioButtonCheck" selected="true" text="Flowable" />
+                              <RadioButton fx:id="activitiRadioButton" mnemonicParsing="false" onAction="#activityRadioButtonCheck" text="Activiti" />
+                           </children>
+                        </HBox>
+                        <Label layoutX="526.0" layoutY="536.0" prefHeight="17.0" prefWidth="64.0" text="XML tags" />
                      </children>
                   </AnchorPane>
               </content>
@@ -133,20 +136,10 @@
                   <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                           <children>
-                              <Label layoutX="64.0" layoutY="158.0" text="Available tasks" />
-                              <Button fx:id="updateViewQueryButton" layoutX="743.0" layoutY="222.0" mnemonicParsing="false" onAction="#updateProcessQueryView" text="Update View" />
+                              <Label layoutX="64.0" layoutY="197.0" text="Available tasks" />
                               <Button fx:id="completeTaskButton" layoutX="687.0" layoutY="378.0" mnemonicParsing="false" onAction="#completeTask" style="-fx-background-color: darkgreen;" text="Complete HumanTask" textFill="WHITE" textOverrun="CLIP" />
                               <Button fx:id="failTaskButton" layoutX="532.0" layoutY="378.0" mnemonicParsing="false" onAction="#failTask" prefHeight="26.0" prefWidth="146.0" style="-fx-background-color: darkred;" text="Fail Human Task" textFill="WHITE" />
-                        <TextArea fx:id="activeTasksTextArea" layoutX="153.0" layoutY="158.0" prefHeight="64.0" prefWidth="440.0" />
-                        <TextField fx:id="processIDTextField" layoutX="153.0" layoutY="119.0" prefHeight="26.0" prefWidth="442.0" />
-                        <Label layoutX="86.0" layoutY="124.0" text="Process ID" />
-                        <TextField fx:id="taskIDTextField" layoutX="155.0" layoutY="337.0" prefHeight="26.0" prefWidth="438.0" promptText="something like ac1bff24-431a-11ed-b04d-76b363516a6f" />
-                        <Label layoutX="54.0" layoutY="342.0" text="Human Task ID" />
-                        <Label layoutX="46.0" layoutY="267.0" text="Human Task type" />
-                        <ListView fx:id="taskTypeListView" layoutX="155.0" layoutY="264.0" prefHeight="67.0" prefWidth="438.0" />
-                              <Label layoutX="14.0" layoutY="14.0" text="Active Emergency plans" />
-                        <TextArea fx:id="activePlansTextArea" layoutX="153.0" layoutY="14.0" prefHeight="90.0" prefWidth="448.0" />
-                        <Separator layoutX="155.0" layoutY="248.0" prefHeight="16.0" prefWidth="675.0" />
+                              <Label layoutX="14.0" layoutY="23.0" text="Active Emergency plans" />
                         <TabPane layoutX="5.0" layoutY="418.0" prefHeight="238.0" prefWidth="822.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
                             <Tab text="Process Status">
@@ -264,10 +257,20 @@
                                     </AnchorPane>
                               </content>
                             </Tab>
+                              <Tab text="Process Status">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <ListView fx:id="processStatusListView" layoutX="14.0" layoutY="3.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </Tab>
                           </tabs>
                         </TabPane>
-                        <ListView fx:id="activePlansListView" layoutX="605.0" layoutY="19.0" prefHeight="87.0" prefWidth="200.0" />
-                        <ListView fx:id="activeTasksListView" layoutX="609.0" layoutY="114.0" prefHeight="89.0" prefWidth="197.0" />
+                        <ListView fx:id="activePlansListView" layoutX="155.0" layoutY="23.0" prefHeight="140.0" prefWidth="670.0" />
+                        <ListView fx:id="activeTasksListView" layoutX="155.0" layoutY="197.0" prefHeight="163.0" prefWidth="671.0" />
+                        <Button layoutX="33.0" layoutY="137.0" mnemonicParsing="false" onAction="#updateProcessListButtonClick" text="Update process list" />
                           </children>
                       </AnchorPane>
                   </content>

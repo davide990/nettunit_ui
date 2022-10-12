@@ -9,7 +9,7 @@ import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.collections.{FXCollections, ObservableList}
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
-import net.liftweb.json.DefaultFormats
+import net.liftweb.json.{DefaultFormats, JString, parse}
 import scalafx.application.Platform
 import scalafx.beans.property.{ReadOnlyStringWrapper, StringProperty}
 import scalafx.collections.ObservableBuffer
@@ -29,13 +29,15 @@ import scala.io.Source
 
 case class ServiceTaskView(view: String, fullClassName: String)
 
-case class UserTaskDetail (taskID: String, taskName: String, processID: String, taskData:Map[String, Object])
-
+case class UserTaskDetail(taskID: String, taskName: String, processID: String)
 
 @sfxml
-class UIController(private val activePlansListView: ListView[String],
-                   private val activeTasksListView: ListView[String],
-                    private val flowableReadyProcessCheckBox: CheckBox,
+class UIController(private val processStatusListView: ListView[String],
+                   private val flowableRadioButton: RadioButton,
+                   private val activitiRadioButton: RadioButton,
+                   private val activePlansListView: ListView[String],
+                   private val activeTasksListView: ListView[UserTaskDetail],
+
 
                    private val submitServiceTaskFailureButton: Button,
                    private val mareImageView: ImageView,
@@ -120,7 +122,7 @@ class UIController(private val activePlansListView: ListView[String],
                    private val sendJixelEventButton: Button,
                    private val planImageView: ImageView,
                    private val taskTypeListView: ListView[String],
-                   private val taskIDTextField: TextField,
+
                    private val processIDTextField: TextField,
                    private val MUSAAddressTextField: TextField,
                    private val MUSAPortTextField: TextField,
@@ -128,8 +130,7 @@ class UIController(private val activePlansListView: ListView[String],
                    private val convertGoalSPECButton: Button,
                    private val GoalSPECTextArea: TextArea,
                    private val BPMNTextArea: TextArea,
-                   private val activePlansTextArea: TextArea,
-                   private val activeTasksTextArea: TextArea,
+
                    private val applyIncidentButton: Button,
                    private val completeTaskButton: Button,
                    private val emergencyTypeField: TextField,
@@ -137,16 +138,10 @@ class UIController(private val activePlansListView: ListView[String],
                    private val operatorNameField: TextField,
                    private val flowableAddressTextField: TextField,
                    private val flowablePortTextField: TextField,
-                   private val planIDField: TextField,
-                   private val updateViewQueryButton: Button) {
+                   private val planIDField: TextField) {
 
-  val taskTypes = ObservableBuffer("safety_manager/send_team_to_evaluate")
-  taskTypes += "plant_operator/activate_internal_security_plan"
-  taskTypes += "commander_fire_brigade/decide_response_type"
-  taskTypes += "prefect/declare_pre_alert_state"
-  taskTypes += "ARPA/evaluate_fire_radiant_energy"
-  taskTypes += "prefect/declare_alarm_state"
-  taskTypeListView.items = taskTypes
+  //necessary for parsing json
+  implicit val formats = DefaultFormats
 
   val serviceTasks = ObservableBuffer(ServiceTaskView("do_crossborder_communication", "nettunit.handler.do_crossborder_communication"))
   serviceTasks += ServiceTaskView("ensure_presence_of_qualified_personnel", "nettunit.handler.ensure_presence_of_qualified_personnel")
@@ -158,6 +153,33 @@ class UIController(private val activePlansListView: ListView[String],
   serviceTasks += ServiceTaskView("prepare_tech_report", "nettunit.handler.prepare_tech_report")
   serviceTaskListView.items = serviceTasks
 
+  processStatusListView.getItems.add("aaaaa")
+  processStatusListView.getItems.add("aaaaa")
+  processStatusListView.getItems.add("aaaaa")
+
+  activePlansListView.getSelectionModel.selectedItemProperty().addListener(new ChangeListener[String] {
+    override def changed(observableValue: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit = {
+      updateTaskListButtonClick(null)
+    }
+  })
+
+  processStatusListView.cellFactory = {
+    a: ListView[String] => {
+      val cell = new ListCell[String]
+      cell.item.onChange { (a, b, newValue) => {
+        if (newValue != null) {
+          cell.text = newValue
+          cell.style = ".list-cell {\n    -fx-text-fill: red; /* 5 */\n    -fx-background-radius: 0 0 18 18;\n    -fx-border-radius: 0 0 18 18;\n    -fx-background-color: #FC3D44;\n}"
+        } else {
+          cell.text = null
+          cell.style = null
+        }
+      }
+      }
+      cell
+    }
+  }
+
   private val SUBMIT_SERVICE_TASK_RESTORE = "Restore activity"
   private val SUBMIT_SERVICE_TASK_FAIL = "Submit failure request"
 
@@ -166,6 +188,35 @@ class UIController(private val activePlansListView: ListView[String],
       setFailActivityButtonStatus(newValue)
     }
   })
+
+  serviceTaskListView.cellFactory = {
+    a: ListView[ServiceTaskView] => {
+      val cell = new ListCell[ServiceTaskView]
+      cell.item.onChange { (a, b, newValue) => {
+        if (newValue != null) {
+          cell.text = newValue.view
+        } else {
+          cell.text = null
+        }
+      }
+      }
+      cell
+    }
+  }
+
+  activeTasksListView.cellFactory = {
+    p: ListView[UserTaskDetail] => {
+      val cell = new ListCell[UserTaskDetail]
+      cell.item.onChange { (_, _, str) =>
+        if (str != null) {
+          cell.text = s"${str.taskName} [${str.taskID}]"
+        } else {
+          cell.text = null
+        }
+      }
+      cell
+    }
+  }
 
   private def setFailActivityButtonStatus(selectedView: ServiceTaskView): Unit = {
     if (failingTaskName.isDefined) {
@@ -178,19 +229,6 @@ class UIController(private val activePlansListView: ListView[String],
     submitServiceTaskFailureButton.setText(SUBMIT_SERVICE_TASK_FAIL)
     submitServiceTaskFailureButton.setStyle("-fx-background-color: darkred;-fx-text-fill: white;")
 
-  }
-
-  serviceTaskListView.cellFactory = {
-    a: ListView[ServiceTaskView] => {
-      val cell = new ListCell[ServiceTaskView]
-      cell.item.onChange { (a, b, newValue) => {
-        if (newValue != null) {
-          cell.text = newValue.view
-        }
-      }
-      }
-      cell
-    }
   }
 
   processDef_IDColumn.cellValueFactory = _.value.id
@@ -238,12 +276,9 @@ class UIController(private val activePlansListView: ListView[String],
   actInstHi_delete_reasonColumn.cellValueFactory = _.value.delete_reason
 
   val processImage = new Image(new FileInputStream(getClass.getResource("/process.png").getFile))
-
   val cooperationTransfrontaliereImage = new Image(new FileInputStream(getClass.getResource("/banners/nettunitHaut.png").getFile))
   nettunitHautImageView.setImage(cooperationTransfrontaliereImage)
-
   mareImageView.setImage(new Image(new FileInputStream(getClass.getResource("/banners/slide-1.1.png").getFile)))
-
   jixelImageView.setImage(new Image(new FileInputStream(getClass.getResource("/jixel.png").getFile)))
   nettunitImageView.setImage(new Image(new FileInputStream(getClass.getResource("/nettunit.png").getFile)))
 
@@ -322,7 +357,7 @@ class UIController(private val activePlansListView: ListView[String],
     eclipseBPMNEditorReadyBPMNString = eclipseBPMNEditorReadyBPMNString.replace("flowable:executionListener", "activiti:executionListener")
     eclipseBPMNEditorReadyBPMNString = eclipseBPMNEditorReadyBPMNString.replace("flowable:class", "activiti:class")
 
-    flowableReadyProcessCheckBox.isSelected match {
+    flowableRadioButton.isSelected match {
       case true => BPMNTextArea.setText(flowableReadyBPMNString)
       case false => BPMNTextArea.setText(eclipseBPMNEditorReadyBPMNString)
     }
@@ -340,83 +375,91 @@ class UIController(private val activePlansListView: ListView[String],
   }
 
   @FXML private[nettunit] def completeTask(event: ActionEvent): Unit = {
-    if (taskTypeListView.getSelectionModel.getSelectedItems.isEmpty) {
+    if (activeTasksListView.getSelectionModel.getSelectedItems.isEmpty) {
       new Alert(AlertType.Information, "no task selected").showAndWait()
       return
     }
 
-    val taskType = taskTypeListView.getSelectionModel.getSelectedItems.get(0)
-    val taskID = taskIDTextField.getText
-    val requestString = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/$taskType/$taskID"
+    val selectedTask = activeTasksListView.getSelectionModel.getSelectedItems.get(0)
+
+    val taskEndPoint = getNETTUNITCapabilityMatching(selectedTask.taskName)
+    val taskID = selectedTask.taskID
+    val requestString = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/$taskEndPoint/$taskID"
 
     try {
       val resultApply = Http(requestString).postData("").asString
       new Alert(AlertType.Information, s"Result: ${
         resultApply.statusLine
       }").showAndWait()
-      //updateProcessImageView()
-      updateProcessIconImageViews()
+      //      updateProcessIconImageViews()
     } catch {
       case _: SocketTimeoutException => new Alert(AlertType.Error, s"Socket timeout").showAndWait()
     }
+
+    updateTaskListButtonClick(null)
+  }
+
+  @FXML private[nettunit] def flowableRadioButtonCheck(event: ActionEvent): Unit = {
+    flowableRadioButton.setSelected(true)
+    activitiRadioButton.setSelected(false)
+    deployToFlowableButton.setDisable(false)
+    BPMNTextArea.setText(flowableReadyBPMNString)
+  }
+
+  @FXML private[nettunit] def activityRadioButtonCheck(event: ActionEvent): Unit = {
+    flowableRadioButton.setSelected(false)
+    activitiRadioButton.setSelected(true)
+    BPMNTextArea.setText(eclipseBPMNEditorReadyBPMNString)
+    deployToFlowableButton.setDisable(true)
+
   }
 
   @FXML private[nettunit] def failTask(event: ActionEvent): Unit = {
     println("fail task")
   }
 
-  @FXML private[nettunit] def updateProcessQueryView(event: ActionEvent): Unit = {
-    try {
-      val resultApply = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/incident_list/").method("GET").asString
-      activePlansTextArea.setText(resultApply.body)
-
-      if (resultApply.body != "[]"){
-        val strings = resultApply.body.substring(1,resultApply.body.length-1)
-        //val processID = strings.replace('"',' ').split(",")
-        val processID =strings.filter(!"\"".contains(_)).split(',')
-        activePlansListView.getItems.clear()
-        processID.foreach(pid => activePlansListView.getItems.add(pid))
-
-
-      }
-
-
-//val a = resultApply.sub
-
-      //da eliminare se non si usa l'immagine
-      if (activePlansTextArea.getText == "[]") {
-        do_crossborder_communication_circle.setVisible(false)
-        ensure_presence_of_qualified_personnel_circle.setVisible(false)
-        ensure_presence_of_representative_circle.setVisible(false)
-        inform_technical_rescue_organisation_alert_circle.setVisible(false)
-        inform_technical_rescue_organisation_internal_plan_circle.setVisible(false)
-        keep_update_involved_personnel_circle.setVisible(false)
-        notify_competent_body_internal_plan_circle.setVisible(false)
-        prepare_tech_report_circle.setVisible(false)
-        sendTeamImage.setVisible(false)
-        activateInternalPlanImage.setVisible(false)
-        InformRescueInternalPlanImage.setVisible(false)
-        decideResponseTypeImage.setVisible(false)
-        prepareReportImage.setVisible(false)
-        keepUpdateImage.setVisible(false)
-        declarePreAlertImage.setVisible(false)
-        informRescueAlertImage.setVisible(false)
-        evaluateFireRadiantImage.setVisible(false)
-        declareAlarmImage.setVisible(false)
-        notifyCompetentBodiesImage.setVisible(false)
-        ensurePresenceImage.setVisible(false)
-        doCrossBorderImage.setVisible(false)
-        ensureQualifiedPersonnelImage.setVisible(false)
-        adaptationTaskImage.setVisible(false)
-      }
-
-      if (!processIDTextField.getText.isEmpty) {
-        val resultApply2 = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/task_list/${processIDTextField.getText}").method("GET").asString
-        activeTasksTextArea.setText(resultApply2.body)
-      }
-    } catch {
-      case _: ConnectException => new Alert(AlertType.Error, s"unable to connect. Please check if flowable is active").showAndWait()
+  @FXML private[nettunit] def updateTaskListButtonClick(event: ActionEvent): Unit = {
+    if (activePlansListView.getSelectionModel.getSelectedItems.isEmpty) {
+      return
     }
+    activeTasksListView.getItems.clear()
+    val selectedProcess = activePlansListView.getSelectionModel.getSelectedItems.get(0)
+    if (!selectedProcess.isEmpty) {
+      val resultApply2 = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/task_list/${selectedProcess}").method("GET").asString
+      val ll = parse(resultApply2.body)
+
+      val childrenName = (ll \\ "taskName").children
+      val childrenID = (ll \\ "taskID").children
+      val childrenProcessID = (ll \\ "processID").children
+      for (i <- 0 until childrenName.size) {
+        val taskName = childrenName(0).asInstanceOf[JString].s
+        val taskID = childrenID(0).asInstanceOf[JString].s
+        val processID = childrenProcessID(0).asInstanceOf[JString].s
+        val ut = UserTaskDetail(taskID, taskName, processID)
+        activeTasksListView.getItems.add(ut)
+      }
+    }
+  }
+
+  def getNETTUNITCapabilityMatching(capName: String): String = capName match {
+    case "Send team to evaluate" => "safety_manager/send_team_to_evaluate"
+    case "Activate internal plan" => "plant_operator/activate_internal_security_plan"
+    case "Decide response type" => "commander_fire_brigade/decide_response_type"
+    case "Declare pre-alert state" => "prefect/declare_pre_alert_state"
+    case "Evaluate fire radiant energy" => "ARPA/evaluate_fire_radiant_energy"
+    case "Declare alarm state" => "prefect/declare_alarm_state"
+  }
+
+  @FXML private[nettunit] def updateProcessListButtonClick(event: ActionEvent): Unit = {
+    val resultApply = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/incident_list/").method("GET").asString
+    if (resultApply.body != "[]") {
+      val strings = resultApply.body.substring(1, resultApply.body.length - 1)
+      val processID = strings.filter(!"\"".contains(_)).split(',')
+      activePlansListView.getItems.clear()
+      processID.foreach(pid => activePlansListView.getItems.add(pid))
+    }
+
+    activeTasksListView.getItems.clear()
   }
 
   private def getFlowableAddressPort(): String = flowablePortTextField.getText match {
@@ -665,16 +708,6 @@ class UIController(private val activePlansListView: ListView[String],
     val content = new ClipboardContent
     content.putString(BPMNTextArea.getText)
     clipboard.setContent(content)
-  }
-
-  @FXML private[nettunit] def onFlowableReadyCheckboxChanged(event: ActionEvent): Unit = flowableReadyProcessCheckBox.isSelected match {
-    case true => {
-      deployToFlowableButton.setDisable(false)
-      BPMNTextArea.setText(flowableReadyBPMNString)
-    }
-    case false =>
-      BPMNTextArea.setText(eclipseBPMNEditorReadyBPMNString)
-      deployToFlowableButton.setDisable(true)
   }
 
 
