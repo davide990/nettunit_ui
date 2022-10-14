@@ -2,17 +2,21 @@ package nettunit
 
 import JixelAPIInterface.JixelInterface
 import JixelAPIInterface.Login.ECOSUsers
+import RabbitMQ.JixelEvent
 import RabbitMQ.Launchers.Jixel.JixelClientTest.jixel
 import RabbitMQ.Producer.JixelRabbitMQProducer
+import RabbitMQ.Serializer.JixelEventJsonSerializer
 import Utils.JixelUtil
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.collections.{FXCollections, ObservableList}
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
-import net.liftweb.json.{DefaultFormats, JString, parse}
+import net.liftweb.json.Extraction.decompose
+import net.liftweb.json.{DefaultFormats, JInt, JString, JValue, parse, prettyRender}
 import scalafx.application.Platform
 import scalafx.beans.property.{ReadOnlyStringWrapper, StringProperty}
 import scalafx.collections.ObservableBuffer
+import scalafx.embed.swing.SwingFXUtils
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
 import scalafx.scene.image.{Image, ImageView}
@@ -21,21 +25,23 @@ import scalafx.scene.shape.Circle
 import scalafxml.core.macros.sfxml
 import scalaj.http.{Http, HttpResponse}
 
-import java.io.{File, FileInputStream}
+import java.io.{ByteArrayInputStream, File, FileInputStream}
 import java.net.{ConnectException, SocketTimeoutException}
 import java.sql.Timestamp
-import java.util.{Date, Timer}
-import scala.io.Source
+import javax.imageio.ImageIO
+import scala.collection.mutable.ListBuffer
 
-case class ServiceTaskView(view: String, fullClassName: String)
+case class ServiceTaskView(label: String, fullClassName: String)
 
 case class UserTaskDetail(taskID: String, taskName: String, processID: String)
 
+case class ProcessInstanceDetail(name: String, processInstanceID: String, processDefinitionName: String, processDefinitionVersion: Int)
+
 @sfxml
-class UIController(private val processStatusListView: ListView[String],
+class UIController(private val processStatusListView: ListView[UserTaskDetail],
                    private val flowableRadioButton: RadioButton,
                    private val activitiRadioButton: RadioButton,
-                   private val activePlansListView: ListView[String],
+                   private val activePlansListView: ListView[ProcessInstanceDetail],
                    private val activeTasksListView: ListView[UserTaskDetail],
 
 
@@ -43,31 +49,6 @@ class UIController(private val processStatusListView: ListView[String],
                    private val mareImageView: ImageView,
                    private val jixelImageView: ImageView,
                    private val nettunitHautImageView: ImageView,
-
-                   private val do_crossborder_communication_circle: Circle,
-                   private val ensure_presence_of_qualified_personnel_circle: Circle,
-                   private val ensure_presence_of_representative_circle: Circle,
-                   private val inform_technical_rescue_organisation_alert_circle: Circle,
-                   private val inform_technical_rescue_organisation_internal_plan_circle: Circle,
-                   private val keep_update_involved_personnel_circle: Circle,
-                   private val notify_competent_body_internal_plan_circle: Circle,
-                   private val prepare_tech_report_circle: Circle,
-
-                   private val sendTeamImage: ImageView,
-                   private val activateInternalPlanImage: ImageView,
-                   private val InformRescueInternalPlanImage: ImageView,
-                   private val decideResponseTypeImage: ImageView,
-                   private val prepareReportImage: ImageView,
-                   private val keepUpdateImage: ImageView,
-                   private val declarePreAlertImage: ImageView,
-                   private val informRescueAlertImage: ImageView,
-                   private val evaluateFireRadiantImage: ImageView,
-                   private val declareAlarmImage: ImageView,
-                   private val notifyCompetentBodiesImage: ImageView,
-                   private val ensurePresenceImage: ImageView,
-                   private val doCrossBorderImage: ImageView,
-                   private val ensureQualifiedPersonnelImage: ImageView,
-                   private val adaptationTaskImage: ImageView,
 
                    private val serviceTaskListView: ListView[ServiceTaskView],
                    private val actInstanceHITableView: TableView[FlowableActInstHistoricRecord],
@@ -153,23 +134,25 @@ class UIController(private val processStatusListView: ListView[String],
   serviceTasks += ServiceTaskView("prepare_tech_report", "nettunit.handler.prepare_tech_report")
   serviceTaskListView.items = serviceTasks
 
-  processStatusListView.getItems.add("aaaaa")
-  processStatusListView.getItems.add("aaaaa")
-  processStatusListView.getItems.add("aaaaa")
-
-  activePlansListView.getSelectionModel.selectedItemProperty().addListener(new ChangeListener[String] {
-    override def changed(observableValue: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit = {
+  activePlansListView.getSelectionModel.selectedItemProperty().addListener(new ChangeListener[ProcessInstanceDetail] {
+    override def changed(observableValue: ObservableValue[_ <: ProcessInstanceDetail], oldValue: ProcessInstanceDetail, newValue: ProcessInstanceDetail): Unit = {
       updateTaskListButtonClick(null)
+      updateCompletedTasks(null)
     }
   })
 
   processStatusListView.cellFactory = {
-    a: ListView[String] => {
-      val cell = new ListCell[String]
+    a: ListView[UserTaskDetail] => {
+      val cell = new ListCell[UserTaskDetail]
       cell.item.onChange { (a, b, newValue) => {
         if (newValue != null) {
-          cell.text = newValue
-          cell.style = ".list-cell {\n    -fx-text-fill: red; /* 5 */\n    -fx-background-radius: 0 0 18 18;\n    -fx-border-radius: 0 0 18 18;\n    -fx-background-color: #FC3D44;\n}"
+          cell.text = newValue.taskName
+          if (failingTaskName.isDefined) {
+            if (failingTaskName.get.label == newValue) {
+              cell.style = ".list-cell {\n    -fx-text-fill: white; /* 5 */\n    -fx-background-radius: 4 4 4 4;\n    -fx-border-radius: 2 2 2 2;\n    -fx-background-color: darkred;\n}"
+            }
+          }
+          //cell.style = ".list-cell {\n    -fx-text-fill: black; /* 5 */\n    -fx-background-radius: 4 4 4 4;\n    -fx-border-radius: 2 2 2 2;\n    -fx-background-color: #FFFFBF;\n}"
         } else {
           cell.text = null
           cell.style = null
@@ -194,7 +177,7 @@ class UIController(private val processStatusListView: ListView[String],
       val cell = new ListCell[ServiceTaskView]
       cell.item.onChange { (a, b, newValue) => {
         if (newValue != null) {
-          cell.text = newValue.view
+          cell.text = newValue.label
         } else {
           cell.text = null
         }
@@ -218,9 +201,24 @@ class UIController(private val processStatusListView: ListView[String],
     }
   }
 
+  activePlansListView.cellFactory = {
+    p: ListView[ProcessInstanceDetail] => {
+      val cell = new ListCell[ProcessInstanceDetail]
+      cell.item.onChange { (_, _, str) =>
+        if (str != null) {
+          cell.text = s"${str.processDefinitionName} [version: ${str.processDefinitionVersion}; ID: ${str.processInstanceID}]"
+        } else {
+          cell.text = null
+          cell.style = null
+        }
+      }
+      cell
+    }
+  }
+
   private def setFailActivityButtonStatus(selectedView: ServiceTaskView): Unit = {
     if (failingTaskName.isDefined) {
-      if (selectedView.view == failingTaskName.get.view) {
+      if (selectedView.label == failingTaskName.get.label) {
         submitServiceTaskFailureButton.setText(SUBMIT_SERVICE_TASK_RESTORE)
         submitServiceTaskFailureButton.setStyle("-fx-background-color: darkgreen;-fx-text-fill: white;")
         return
@@ -228,7 +226,6 @@ class UIController(private val processStatusListView: ListView[String],
     }
     submitServiceTaskFailureButton.setText(SUBMIT_SERVICE_TASK_FAIL)
     submitServiceTaskFailureButton.setStyle("-fx-background-color: darkred;-fx-text-fill: white;")
-
   }
 
   processDef_IDColumn.cellValueFactory = _.value.id
@@ -275,7 +272,7 @@ class UIController(private val processStatusListView: ListView[String],
   actInstHi_durationColumn.cellValueFactory = _.value.duration
   actInstHi_delete_reasonColumn.cellValueFactory = _.value.delete_reason
 
-  val processImage = new Image(new FileInputStream(getClass.getResource("/process.png").getFile))
+  //val processImage = new Image(new FileInputStream(getClass.getResource("/process.png").getFile))
   val cooperationTransfrontaliereImage = new Image(new FileInputStream(getClass.getResource("/banners/nettunitHaut.png").getFile))
   nettunitHautImageView.setImage(cooperationTransfrontaliereImage)
   mareImageView.setImage(new Image(new FileInputStream(getClass.getResource("/banners/slide-1.1.png").getFile)))
@@ -298,22 +295,6 @@ class UIController(private val processStatusListView: ListView[String],
   var flowableReadyBPMNString = ""
   //String containing the BPMN string modified to be as graphical bpmn into eclipse with flowable plugin editor
   var eclipseBPMNEditorReadyBPMNString = ""
-
-  sendTeamImage.setVisible(false)
-  activateInternalPlanImage.setVisible(false)
-  InformRescueInternalPlanImage.setVisible(false)
-  decideResponseTypeImage.setVisible(false)
-  prepareReportImage.setVisible(false)
-  keepUpdateImage.setVisible(false)
-  declarePreAlertImage.setVisible(false)
-  informRescueAlertImage.setVisible(false)
-  evaluateFireRadiantImage.setVisible(false)
-  declareAlarmImage.setVisible(false)
-  notifyCompetentBodiesImage.setVisible(false)
-  ensurePresenceImage.setVisible(false)
-  doCrossBorderImage.setVisible(false)
-  ensureQualifiedPersonnelImage.setVisible(false)
-  adaptationTaskImage.setVisible(false)
 
   val login = ECOSUsers.davide_login
 
@@ -361,8 +342,24 @@ class UIController(private val processStatusListView: ListView[String],
       case true => BPMNTextArea.setText(flowableReadyBPMNString)
       case false => BPMNTextArea.setText(eclipseBPMNEditorReadyBPMNString)
     }
-    //BPMNTextArea.setText(resultApply.body)
 
+    println("ok")
+  }
+
+  def getUserTaskList(goals: String): Unit = {
+    val connectionString2 = s"http://$getMUSAAddress:$getMUSAAddressPort/UserTasks"
+    val resultApply2 = Http(connectionString2)
+      .header("Content-Type", "text/plain")
+      .postData(goals)
+      .asString
+  }
+
+  def getServiceTaskList(goals: String): Unit = {
+    val connectionString2 = s"http://$getMUSAAddress:$getMUSAAddressPort/ServiceTasks"
+    val resultApply2 = Http(connectionString2)
+      .header("Content-Type", "text/plain")
+      .postData(goals)
+      .asString
   }
 
   @FXML private[nettunit] def onDeployProcessToFlowable(event: ActionEvent): Unit = {
@@ -379,24 +376,50 @@ class UIController(private val processStatusListView: ListView[String],
       new Alert(AlertType.Information, "no task selected").showAndWait()
       return
     }
-
     val selectedTask = activeTasksListView.getSelectionModel.getSelectedItems.get(0)
-
     val taskEndPoint = getNETTUNITCapabilityMatching(selectedTask.taskName)
     val taskID = selectedTask.taskID
+    println(s"request complete task for ID [$taskID]")
     val requestString = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/$taskEndPoint/$taskID"
-
     try {
       val resultApply = Http(requestString).postData("").asString
       new Alert(AlertType.Information, s"Result: ${
         resultApply.statusLine
       }").showAndWait()
-      //      updateProcessIconImageViews()
     } catch {
       case _: SocketTimeoutException => new Alert(AlertType.Error, s"Socket timeout").showAndWait()
     }
 
     updateTaskListButtonClick(null)
+    updateCompletedTasks(null)
+  }
+
+  def updateCompletedTasks(event: ActionEvent): Unit = {
+    if (activePlansListView.getSelectionModel.getSelectedItems.isEmpty) {
+      return
+    }
+    val selectedProcess = activePlansListView.getSelectionModel.getSelectedItems.get(0).processInstanceID
+    val requestStringUpdate = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/completed_tasks/$selectedProcess"
+
+    try {
+      val resultApply = Http(requestStringUpdate).method("GET").asString
+      val ll = parse(resultApply.body)
+      processStatusListView.getItems.clear()
+      val childrenName = (ll \\ "taskName").children
+      val childrenID = (ll \\ "taskID").children
+      val childrenProcessID = (ll \\ "processID").children
+      for (i <- 0 until childrenName.size) {
+        val taskName = childrenName(i).asInstanceOf[JString].s
+        val taskID = childrenID(i).asInstanceOf[JString].s
+        val processID = childrenProcessID(i).asInstanceOf[JString].s
+        val ut = UserTaskDetail(taskID, taskName, processID)
+        processStatusListView.getItems.add(ut)
+      }
+    } catch {
+      case _: SocketTimeoutException => new Alert(AlertType.Error, s"Socket timeout").showAndWait()
+    }
+
+    updateDiagram(null)
   }
 
   @FXML private[nettunit] def flowableRadioButtonCheck(event: ActionEvent): Unit = {
@@ -423,7 +446,7 @@ class UIController(private val processStatusListView: ListView[String],
       return
     }
     activeTasksListView.getItems.clear()
-    val selectedProcess = activePlansListView.getSelectionModel.getSelectedItems.get(0)
+    val selectedProcess = activePlansListView.getSelectionModel.getSelectedItems.get(0).processInstanceID
     if (!selectedProcess.isEmpty) {
       val resultApply2 = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/task_list/${selectedProcess}").method("GET").asString
       val ll = parse(resultApply2.body)
@@ -432,9 +455,9 @@ class UIController(private val processStatusListView: ListView[String],
       val childrenID = (ll \\ "taskID").children
       val childrenProcessID = (ll \\ "processID").children
       for (i <- 0 until childrenName.size) {
-        val taskName = childrenName(0).asInstanceOf[JString].s
-        val taskID = childrenID(0).asInstanceOf[JString].s
-        val processID = childrenProcessID(0).asInstanceOf[JString].s
+        val taskName = childrenName(i).asInstanceOf[JString].s
+        val taskID = childrenID(i).asInstanceOf[JString].s
+        val processID = childrenProcessID(i).asInstanceOf[JString].s
         val ut = UserTaskDetail(taskID, taskName, processID)
         activeTasksListView.getItems.add(ut)
       }
@@ -450,16 +473,45 @@ class UIController(private val processStatusListView: ListView[String],
     case "Declare alarm state" => "prefect/declare_alarm_state"
   }
 
-  @FXML private[nettunit] def updateProcessListButtonClick(event: ActionEvent): Unit = {
-    val resultApply = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/incident_list/").method("GET").asString
+  //TODO delete
+  @FXML private[nettunit] def updateProcessListButtonClickOld(event: ActionEvent): Unit = {
+    /*val resultApply = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/incident_list/").method("GET").asString
     if (resultApply.body != "[]") {
       val strings = resultApply.body.substring(1, resultApply.body.length - 1)
       val processID = strings.filter(!"\"".contains(_)).split(',')
       activePlansListView.getItems.clear()
       processID.foreach(pid => activePlansListView.getItems.add(pid))
+    } else {
+      activePlansListView.getItems.clear()
     }
 
-    activeTasksListView.getItems.clear()
+    activeTasksListView.getItems.clear()*/
+  }
+
+  @FXML private[nettunit] def updateProcessListButtonClick(event: ActionEvent): Unit = {
+    val request = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/incident_list_new/"
+    val resultApply = Http(request).method("GET").asString
+    val ll = parse(resultApply.body)
+    processStatusListView.getItems.clear()
+    activePlansListView.getItems.clear()
+    val childrenProcessName = (ll \\ "name").children
+    val childrenProcessInstanceID = (ll \\ "processInstanceID").children
+    val childrenProcessDefName = (ll \\ "processDefinitionName").children
+    val childrenProcessDefVersion = (ll \\ "processDefinitionVersion").children
+
+    if (childrenProcessDefName.isEmpty){
+      processImageView.setImage(null)
+    }
+
+    for (i <- 0 until childrenProcessName.size) {
+      val processName = childrenProcessName(i).asInstanceOf[JString].s
+      val processInstanceID = childrenProcessInstanceID(i).asInstanceOf[JString].s
+      val processDefName = childrenProcessDefName(i).asInstanceOf[JString].s
+      val processDefVersion = childrenProcessDefVersion(i).asInstanceOf[JInt].num
+
+      val details = ProcessInstanceDetail(processName, processInstanceID, processDefName, processDefVersion.intValue)
+      activePlansListView.getItems.add(details)
+    }
   }
 
   private def getFlowableAddressPort(): String = flowablePortTextField.getText match {
@@ -484,13 +536,14 @@ class UIController(private val processStatusListView: ListView[String],
 
   @FXML private[nettunit] def onSendJixelEventButtonClick(event: ActionEvent): Unit = {
     jixel = new JixelRabbitMQProducer
-    val jixelUser = JixelInterface.parseToJixelCredential(JixelInterface.connect(login))
-    val ev = JixelUtil.eventFromEventSummary(login, Utils.JixelUtil.getAnyJixelEvent(login));
-    val response = jixel.notifyEvent(ev)
+    val testEvent3 = "{\n    \"id\": 3759,\n    \"description\": \"TEST MUSA DESC LIKE API OK\",\n    \"casualties\": null,\n    \"caller_name\": \"\",\n    \"caller_phone\": \"\",\n    \"incident_interface_fire\": false,\n    \"incident_distance\": null,\n    \"incident_msgtype_id\": 1,\n    \"incident_type_id\": 12,\n    \"incident_status_id\": 2,\n    \"incident_id\": 3758,\n    \"headline\": \"TEST MUSA HEADLINE\",\n    \"date\": \"2022-10-11T10:59:07+0200\",\n    \"completable\": false,\n    \"public\": false,\n    \"controllable_object\": {\n      \"id\": 74434,\n      \"created\": \"2022-10-11T10:59:07+0200\",\n      \"modified\": \"2022-10-11T14:45:43+0200\",\n      \"organisation_id\": 2242,\n      \"controllable_object_type_id\": 1,\n      \"last_activity_entry_id\": 16309,\n      \"check_code\": \"e431e7cf7d36c4cb944c94680947e5b1\",\n      \"emergency_scenario_id\": null,\n      \"emergency_scenario_activity\": 0,\n      \"create_user_id\": 9,\n      \"edit_user_id\": 9,\n      \"edit_organisation_id\": 2242,\n      \"deleted\": null,\n      \"organisation\": {\n        \"id\": 2242,\n        \"acronym\": \"IES\",\n        \"address\": \"Via Magna Grecia, Canalicchio, Tremestieri Etneo, Catania, Sicilia, 95030, Italia\",\n        \"district\": \"Tremestieri Etneo\",\n        \"cap\": \"\",\n        \"province\": \"\",\n        \"phone\": \"\",\n        \"mobile\": \"3405681233 (Personale), 3405681234 (Personale)\",\n        \"fax\": \"095355980 (Ufficio), 095355981 (Ufficio)\",\n        \"email\": \"mailsenzanotifica@gmail.com (Ufficio), mailconnotifica@gmail.com (Ufficio)\",\n        \"organisation_type_id\": 0,\n        \"actor_id\": 6681,\n        \"incident_creator\": false,\n        \"pec\": \"\",\n        \"geotype\": \"marker\",\n        \"coordinates\": \"15.0990811 37.5397058\",\n        \"feature_collection\": null,\n        \"deleted\": null,\n        \"photo\": null,\n        \"incident_default_tab\": -3,\n        \"loggable_object_id\": 15119,\n        \"controllable_object_interface_id\": 1118,\n        \"allow_badges\": false,\n        \"actor\": {\n          \"id\": 6681,\n          \"description\": \"IES Solutions SRL\",\n          \"actor_type_id\": 1,\n          \"interoperability_identifier\": null,\n          \"incident_type_group_id\": null,\n          \"deleted\": null,\n          \"description_with_actor_type\": \"IES Solutions SRL (Organizzazione)\",\n          \"actor_type_description\": \"Organizzazione\"\n        }\n      },\n      \"read\": 0,\n      \"received\": 0,\n      \"additional_parameter_value\": [],\n      \"creator_with_organisation\": \"Giovanni Francesco Catania (IES Solutions SRL)\",\n      \"additional_parameters\": [],\n      \"additional_parameters_for_list\": [],\n      \"attachment_file_names\": [],\n      \"attachment_url_accesses\": [],\n      \"creator_organisation\": \"IES - IES Solutions SRL\"\n    },\n    \"incident_status\": {\n      \"id\": 2,\n      \"description\": \"In Attesa/Accertamento\",\n      \"description_name\": \"Stato evento\",\n      \"description_value\": \"In Attesa/Accertamento\",\n      \"description_category\": \"Evento\",\n      \"additional_parameters\": []\n    },\n    \"incident_msgtype\": {\n      \"id\": 1,\n      \"enum_value\": \"Operativa\",\n      \"description_name\": \"Tipo di comunicazione evento\",\n      \"description_value\": \"Operativa\",\n      \"description_category\": \"Evento\",\n      \"additional_parameters\": [],\n      \"cap_description_value\": \"Request\"\n    },\n    \"_matchingData\": {\n      \"ControllableObjects\": {\n        \"id\": 74434,\n        \"created\": \"2022-10-11T10:59:07+0200\",\n        \"modified\": \"2022-10-11T14:45:43+0200\",\n        \"organisation_id\": 2242,\n        \"controllable_object_type_id\": 1,\n        \"last_activity_entry_id\": 16309,\n        \"check_code\": \"e431e7cf7d36c4cb944c94680947e5b1\",\n        \"emergency_scenario_id\": null,\n        \"emergency_scenario_activity\": 0,\n        \"create_user_id\": 9,\n        \"edit_user_id\": 9,\n        \"edit_organisation_id\": 2242,\n        \"deleted\": null,\n        \"additional_parameter_value\": [],\n        \"creator_with_organisation\": \"Giovanni Francesco Catania (IES Solutions SRL)\",\n        \"additional_parameters\": [],\n        \"additional_parameters_for_list\": [],\n        \"attachment_file_names\": [],\n        \"attachment_url_accesses\": [],\n        \"creator_organisation\": \"IES - IES Solutions SRL\"\n      },\n      \"ControllableObjectActors\": {\n        \"id\": 126416,\n        \"controllable_object_id\": 74434,\n        \"actor_id\": 6681,\n        \"controllable_object_actor_type_id\": 1,\n        \"validation_level_id\": null,\n        \"deleted\": null\n      },\n      \"Organisations\": {\n        \"id\": 2242,\n        \"acronym\": \"IES\",\n        \"address\": \"Via Magna Grecia, Canalicchio, Tremestieri Etneo, Catania, Sicilia, 95030, Italia\",\n        \"district\": \"Tremestieri Etneo\",\n        \"cap\": \"\",\n        \"province\": \"\",\n        \"phone\": \"\",\n        \"mobile\": \"3405681233 (Personale), 3405681234 (Personale)\",\n        \"fax\": \"095355980 (Ufficio), 095355981 (Ufficio)\",\n        \"email\": \"mailsenzanotifica@gmail.com (Ufficio), mailconnotifica@gmail.com (Ufficio)\",\n        \"organisation_type_id\": 0,\n        \"actor_id\": 6681,\n        \"incident_creator\": false,\n        \"pec\": \"\",\n        \"geotype\": \"marker\",\n        \"coordinates\": \"15.0990811 37.5397058\",\n        \"feature_collection\": null,\n        \"deleted\": null,\n        \"photo\": null,\n        \"incident_default_tab\": -3,\n        \"loggable_object_id\": 15119,\n        \"controllable_object_interface_id\": 1118,\n        \"allow_badges\": false\n      },\n      \"Actors\": {\n        \"id\": 6681,\n        \"description\": \"IES Solutions SRL\",\n        \"actor_type_id\": 1,\n        \"interoperability_identifier\": null,\n        \"incident_type_group_id\": null,\n        \"deleted\": null,\n        \"description_with_actor_type\": \"IES Solutions SRL (Organizzazione)\",\n        \"actor_type_description\": \"Organizzazione\"\n      }\n    },\n    \"is_user_recipient\": true,\n    \"updates\": 2,\n    \"entity_type\": \"Evento\",\n    \"entity_description\": \"3759 - TEST MUSA HEADLINE\",\n    \"instructions\": null\n  }"
+    val parsedJixelEvent = JixelEventJsonSerializer.fromJson(testEvent3).asInstanceOf[JixelEvent]
+
+    processStatusListView.getItems.clear()
+
+    val response = jixel.notifyEvent(parsedJixelEvent)
     new Alert(AlertType.Information, s"MUSA Response: ${response}").showAndWait()
-    processImageView.setImage(processImage)
-    sendTeamImage.setImage(pendingIcon)
-    sendTeamImage.setVisible(true)
+
   }
 
   @FXML private[nettunit] def processDefUpdateButtonClick(event: ActionEvent): Unit = {
@@ -522,32 +575,38 @@ class UIController(private val processStatusListView: ListView[String],
 
     failingTaskName.isDefined match {
       case true =>
-        if (serviceTask.view == failingTaskName.get.view) {
+        if (serviceTask.label == failingTaskName.get.label) {
           submitUndoServiceTaskFailure(serviceTask)
           failingTaskName = None
-          new Alert(AlertType.Information, s"Submitted failure request for task: ${serviceTask.view}").showAndWait()
+          new Alert(AlertType.Information, s"Submitted failure request for task: ${serviceTask.label}").showAndWait()
         } else {
           //undo previous task failure request
           submitUndoServiceTaskFailure(failingTaskName.get)
           //request a new failure for selected task
           submitServiceTaskFailure(serviceTask)
-          new Alert(AlertType.Information, s"Submitted failure request for task: ${serviceTask.view}").showAndWait()
+          new Alert(AlertType.Information, s"Submitted failure request for task: ${serviceTask.label}").showAndWait()
         }
       case false =>
         val result = submitServiceTaskFailure(serviceTask)
-        new Alert(AlertType.Information, s"Submitted failure request for task: ${serviceTask.view}").showAndWait()
+        new Alert(AlertType.Information, s"Submitted failure request for task: ${serviceTask.label}").showAndWait()
     }
     serviceTaskListView.refresh()
     setFailActivityButtonStatus(serviceTask)
   }
 
-  def submitUndoServiceTaskFailure(service: ServiceTaskView): HttpResponse[String] = {
+  def submitUndoServiceTaskFailure(service: ServiceTaskView): Unit = {
+    //First tell to flowable
     failingTaskName = Some(service)
     val connectionURL = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/undo_fail/${service.fullClassName}"
     Http(connectionURL)
       .header("Content-Type", "text/xml")
-      .postData("")
-      .asString
+      .postData("").asString
+
+    //Then to musa, so that next plan definition can include the restored capability
+    val connectionString = s"http://$getMUSAAddress:$getMUSAAddressPort/RestoreCapability"
+    Http(connectionString)
+      .header("Content-Type", "text/plain")
+      .postData(service.fullClassName).asString
   }
 
   def submitServiceTaskFailure(service: ServiceTaskView): HttpResponse[String] = {
@@ -559,11 +618,6 @@ class UIController(private val processStatusListView: ListView[String],
       .asString
   }
 
-  private def updateAdaptationTaskImageView(): Unit = {
-    adaptationTaskImage.setVisible(true)
-    adaptationTaskImage.setImage(acceptIcon)
-  }
-
   def isFailingTask(task: String): Boolean = {
     if (!failingTaskName.isDefined) {
       return false
@@ -571,106 +625,6 @@ class UIController(private val processStatusListView: ListView[String],
     failingTaskName.get match {
       case task => true
       case _ => false
-    }
-  }
-
-  private def updateProcessIconImageViews() = taskTypeListView.getSelectionModel.getSelectedItems.get(0) match {
-    case "safety_manager/send_team_to_evaluate" => {
-      sendTeamImage.setImage(acceptHumanIcon)
-      activateInternalPlanImage.setImage(pendingIcon)
-      activateInternalPlanImage.setVisible(true)
-    }
-    case "plant_operator/activate_internal_security_plan" => {
-      activateInternalPlanImage.setImage(acceptHumanIcon)
-      InformRescueInternalPlanImage.setVisible(true)
-      isFailingTask("inform_technical_rescue_organisation_internal_plan") match {
-        case true =>
-          InformRescueInternalPlanImage.setImage(warningIcon)
-          updateAdaptationTaskImageView()
-          inform_technical_rescue_organisation_internal_plan_circle.setVisible(true)
-        case false =>
-          InformRescueInternalPlanImage.setImage(acceptIcon)
-          decideResponseTypeImage.setVisible(true)
-          decideResponseTypeImage.setImage(pendingIcon)
-      }
-    }
-    case "commander_fire_brigade/decide_response_type" => {
-      decideResponseTypeImage.setImage(acceptHumanIcon)
-
-      //prepare tech report && keep update
-      isFailingTask("prepare_tech_report") match {
-        case true =>
-          prepareReportImage.setImage(warningIcon)
-          updateAdaptationTaskImageView()
-          prepare_tech_report_circle.setVisible(true)
-        case false =>
-          prepareReportImage.setImage(acceptIcon)
-          isFailingTask("keep_update_involved_personnel") match {
-            case true =>
-              keepUpdateImage.setImage(warningIcon)
-              updateAdaptationTaskImageView()
-              keep_update_involved_personnel_circle.setVisible(true)
-            case false =>
-              keepUpdateImage.setImage(acceptIcon)
-              declarePreAlertImage.setVisible(true)
-              declarePreAlertImage.setImage(pendingIcon)
-          }
-      }
-    }
-    case "prefect/declare_pre_alert_state" => {
-      declarePreAlertImage.setImage(acceptHumanIcon)
-
-      isFailingTask("inform_technical_rescue_organisation_alert") match {
-        case true =>
-          informRescueAlertImage.setImage(warningIcon)
-          updateAdaptationTaskImageView()
-          inform_technical_rescue_organisation_alert_circle.setVisible(true)
-        case false =>
-          informRescueAlertImage.setImage(acceptIcon)
-          evaluateFireRadiantImage.setVisible(true)
-          evaluateFireRadiantImage.setImage(pendingIcon)
-      }
-    }
-    case "ARPA/evaluate_fire_radiant_energy" => {
-      evaluateFireRadiantImage.setImage(acceptHumanIcon)
-      declareAlarmImage.setVisible(true)
-      declareAlarmImage.setImage(pendingIcon)
-    }
-    case "prefect/declare_alarm_state" => {
-      declareAlarmImage.setImage(acceptHumanIcon)
-      isFailingTask("notify_competent_body_internal_plan") match {
-        case true =>
-          notifyCompetentBodiesImage.setImage(warningIcon)
-          updateAdaptationTaskImageView()
-          notify_competent_body_internal_plan_circle.setVisible(true)
-
-        case false =>
-          notifyCompetentBodiesImage.setImage(acceptIcon)
-          isFailingTask("ensure_presence_of_representative") match {
-            case true =>
-              ensurePresenceImage.setImage(warningIcon)
-              updateAdaptationTaskImageView()
-              ensure_presence_of_representative_circle.setVisible(true)
-            case false =>
-              ensurePresenceImage.setImage(acceptIcon)
-              isFailingTask("do_crossborder_communication") match {
-                case true =>
-                  doCrossBorderImage.setImage(warningIcon)
-                  updateAdaptationTaskImageView()
-                  do_crossborder_communication_circle.setVisible(true)
-                case false =>
-                  doCrossBorderImage.setImage(acceptIcon)
-                  isFailingTask("ensure_presence_of_qualified_personnel") match {
-                    case true =>
-                      ensureQualifiedPersonnelImage.setImage(warningIcon)
-                      updateAdaptationTaskImageView()
-                      ensure_presence_of_qualified_personnel_circle.setVisible(true)
-                    case false =>
-                      ensureQualifiedPersonnelImage.setImage(acceptIcon)
-                  }
-              }
-          }
-      }
     }
   }
 
@@ -701,6 +655,32 @@ class UIController(private val processStatusListView: ListView[String],
     }
 
 
+  }
+
+  @FXML private[nettunit] def updateDiagram(event: ActionEvent): Unit = {
+    if (activePlansListView.getSelectionModel.getSelectedItems.isEmpty) {
+      return
+    }
+    val selectedProcess = activePlansListView.getSelectionModel.getSelectedItems.get(0)
+
+    val requestStringUpdate = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/get_diagram/"
+    val processInstanceDetailJSON = prettyRender(decompose(selectedProcess))
+
+    try {
+      val resultApply = Http(requestStringUpdate)
+        .header("Content-Type", "application/json")
+        .postData(processInstanceDetailJSON).asBytes
+      val is = new ByteArrayInputStream(resultApply.body)
+      val bi = ImageIO.read(is)
+      val im = SwingFXUtils.toFXImage(bi, null)
+      processImageView.setFitWidth(im.getWidth)
+      processImageView.setFitHeight(im.getHeight)
+      processImageView.setImage(im)
+
+
+    } catch {
+      case _: SocketTimeoutException => new Alert(AlertType.Error, s"Socket timeout").showAndWait()
+    }
   }
 
   @FXML private[nettunit] def copyProcessToClipboardButtonClick(event: ActionEvent): Unit = {

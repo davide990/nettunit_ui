@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
@@ -23,7 +24,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
 <VBox xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nettunit.UIController">
@@ -142,106 +142,45 @@
                               <Label layoutX="14.0" layoutY="23.0" text="Active Emergency plans" />
                         <TabPane layoutX="5.0" layoutY="418.0" prefHeight="238.0" prefWidth="822.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
-                            <Tab text="Process Status">
+                            <Tab text="Process Diagram">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="223.0" prefWidth="814.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <content>
-                                              <AnchorPane>
+                                          <HBox>
+                                             <children>
+                                                <VBox prefHeight="200.0" prefWidth="100.0" spacing="3.0">
                                                    <children>
-                                                      <ImageView fx:id="processImageView" fitHeight="800.0" fitWidth="1500.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                         <viewport>
-                                                            <Rectangle2D />
-                                                         </viewport>
-                                                      </ImageView>
-                                                      <ImageView fx:id="sendTeamImage" fitHeight="28.0" fitWidth="30.0" layoutX="109.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="activateInternalPlanImage" fitHeight="28.0" fitWidth="30.0" layoutX="211.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="InformRescueInternalPlanImage" fitHeight="28.0" fitWidth="30.0" layoutX="312.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="decideResponseTypeImage" fitHeight="28.0" fitWidth="30.0" layoutX="413.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="prepareReportImage" fitHeight="28.0" fitWidth="30.0" layoutX="510.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="keepUpdateImage" fitHeight="28.0" fitWidth="30.0" layoutX="612.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="declarePreAlertImage" fitHeight="28.0" fitWidth="30.0" layoutX="715.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="informRescueAlertImage" fitHeight="28.0" fitWidth="30.0" layoutX="820.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="evaluateFireRadiantImage" fitHeight="28.0" fitWidth="30.0" layoutX="915.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="declareAlarmImage" fitHeight="28.0" fitWidth="30.0" layoutX="1019.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="notifyCompetentBodiesImage" fitHeight="28.0" fitWidth="30.0" layoutX="1119.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="ensurePresenceImage" fitHeight="28.0" fitWidth="30.0" layoutX="1219.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="doCrossBorderImage" fitHeight="28.0" fitWidth="30.0" layoutX="1319.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="ensureQualifiedPersonnelImage" fitHeight="28.0" fitWidth="30.0" layoutX="1420.0" layoutY="88.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <ImageView fx:id="adaptationTaskImage" fitHeight="28.0" fitWidth="30.0" layoutX="58.0" layoutY="251.0" pickOnBounds="true" preserveRatio="true" visible="false">
-                                                         <image>
-                                                            <Image url="@../../../../../../Desktop/demo%20infographic/settings.png" />
-                                                         </image>
-                                                      </ImageView>
-                                                      <Circle fx:id="ensure_presence_of_qualified_personnel_circle" fill="#2197ff00" layoutX="1420.0" layoutY="144.0" radius="14.0" stroke="RED" strokeType="INSIDE" strokeWidth="3.0" visible="false" />
-                                                      <Circle fx:id="do_crossborder_communication_circle" fill="#2197ff00" layoutX="1319.0" layoutY="144.0" radius="14.0" stroke="RED" strokeType="INSIDE" strokeWidth="3.0" visible="false" />
-                                                      <Circle fx:id="ensure_presence_of_representative_circle" fill="#2197ff00" layoutX="1219.0" layoutY="145.0" radius="14.0" stroke="RED" strokeType="INSIDE" strokeWidth="3.0" visible="false" />
-                                                      <Circle fx:id="inform_technical_rescue_organisation_alert_circle" fill="#2197ff00" layoutX="815.0" layoutY="145.0" radius="14.0" stroke="RED" strokeType="INSIDE" strokeWidth="3.0" visible="false" />
-                                                      <Circle fx:id="notify_competent_body_internal_plan_circle" fill="#2197ff00" layoutX="1119.0" layoutY="144.0" radius="14.0" stroke="RED" strokeType="INSIDE" strokeWidth="3.0" visible="false" />
-                                                      <Circle fx:id="keep_update_involved_personnel_circle" fill="#2197ff00" layoutX="614.0" layoutY="145.0" radius="14.0" stroke="RED" strokeType="INSIDE" strokeWidth="3.0" visible="false" />
-                                                      <Circle fx:id="prepare_tech_report_circle" fill="#2197ff00" layoutX="513.0" layoutY="145.0" radius="14.0" stroke="RED" strokeType="INSIDE" strokeWidth="3.0" visible="false" />
-                                                      <Circle fx:id="inform_technical_rescue_organisation_internal_plan_circle" fill="#2197ff00" layoutX="312.0" layoutY="145.0" radius="14.0" stroke="RED" strokeType="INSIDE" strokeWidth="3.0" visible="false" />
+                                                      <Label style="-fx-font-weight: bold;" text="Key:">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Label maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="-Infinity" style="-fx-border-color: black; -fx-background-color: white;" text="Task" />
+                                                      <Label maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="-Infinity" style="-fx-border-color: black; -fx-background-color: #BFFFBF;" text="Completed User task" />
+                                                      <Label maxWidth="1.7976931348623157E308" minHeight="30.0" style="-fx-border-color: black; -fx-background-color: #FFFFBF;" text="Pending User task" />
+                                                      <Label maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="-Infinity" style="-fx-border-color: black; -fx-background-color: #BFBFFF;" text="Completed Service task">
+                                                         <VBox.margin>
+                                                            <Insets />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <Label maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="-Infinity" style="-fx-border-color: black; -fx-background-color: #FF7F7F;" text="Failed task" />
                                                    </children>
-                                                </AnchorPane>
-                                            </content>
-                                          </ScrollPane>
+                                                </VBox>
+                                                <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="223.0" prefWidth="814.0">
+                                                  <content>
+                                                    <AnchorPane>
+                                                         <children>
+                                                            <ImageView fx:id="processImageView" fitHeight="800.0" fitWidth="1500.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                               <viewport>
+                                                                  <Rectangle2D />
+                                                               </viewport>
+                                                            </ImageView>
+                                                         </children>
+                                                      </AnchorPane>
+                                                  </content>
+                                                </ScrollPane>
+                                             </children>
+                                          </HBox>
                                        </children>
                                     </AnchorPane>
                               </content>
@@ -261,7 +200,11 @@
                                 <content>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <ListView fx:id="processStatusListView" layoutX="14.0" layoutY="3.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <ListView fx:id="processStatusListView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                                             </children>
+                                          </VBox>
                                        </children>
                                     </AnchorPane>
                                 </content>
