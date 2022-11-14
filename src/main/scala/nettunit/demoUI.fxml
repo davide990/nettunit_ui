@@ -211,9 +211,10 @@
                               </Tab>
                           </tabs>
                         </TabPane>
-                        <ListView fx:id="activePlansListView" layoutX="155.0" layoutY="23.0" prefHeight="140.0" prefWidth="670.0" />
-                        <ListView fx:id="activeTasksListView" layoutX="155.0" layoutY="197.0" prefHeight="163.0" prefWidth="671.0" />
+                        <ListView fx:id="activePlansListView" layoutX="156.0" layoutY="23.0" prefHeight="140.0" prefWidth="669.0" />
+                        <ListView fx:id="activeTasksListView" layoutX="154.0" layoutY="197.0" prefHeight="163.0" prefWidth="672.0" />
                         <Button layoutX="33.0" layoutY="137.0" mnemonicParsing="false" onAction="#updateProcessListButtonClick" text="Update process list" />
+                        <Button layoutX="33.0" layoutY="91.0" mnemonicParsing="false" onAction="#onRemoveProcessInstanceButtonClick" prefHeight="43.0" prefWidth="121.0" style="-fx-background-color: darkred;" text="Remove process &#10;Instance" textAlignment="CENTER" textFill="WHITE" wrapText="true" />
                           </children>
                       </AnchorPane>
                   </content>

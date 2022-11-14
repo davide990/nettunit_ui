@@ -477,7 +477,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
     val childrenProcessDefName = (ll \\ "processDefinitionName").children
     val childrenProcessDefVersion = (ll \\ "processDefinitionVersion").children
 
-    if (childrenProcessDefName.isEmpty){
+    if (childrenProcessDefName.isEmpty) {
       processImageView.setImage(null)
     }
 
@@ -666,6 +666,37 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
     val content = new ClipboardContent
     content.putString(BPMNTextArea.getText)
     clipboard.setContent(content)
+  }
+
+  @FXML private[nettunit] def onRemoveProcessInstanceButtonClick(event: ActionEvent): Unit = {
+    if (activePlansListView.getSelectionModel.getSelectedItems.isEmpty) {
+      new Alert(AlertType.Information, "No plan selected").showAndWait()
+      return
+    }
+
+    // Create and show confirmation alert
+    val alert = new Alert(AlertType.Confirmation) {
+      title = "Confirmation Dialog"
+      headerText = "Delete the selected process instance?"
+      contentText = "Are you ok with this?"
+    }
+
+    val result = alert.showAndWait()
+
+    // React to user's selectioon
+    result match {
+      case Some(ButtonType.OK) => {
+        val selectedProcess = activePlansListView.getSelectionModel.getSelectedItems.get(0).processInstanceID
+        val connectionURL = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/removeProcessInstance/$selectedProcess"
+        val resultApply = Http(connectionURL)
+          .header("Content-Type", "text/xml")
+          .postData("")
+          .asString
+
+        new Alert(AlertType.Information, s"All done.").showAndWait()
+      }
+      case _ =>
+    }
   }
 
 
