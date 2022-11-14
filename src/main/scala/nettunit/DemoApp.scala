@@ -21,7 +21,6 @@ object DemoApp extends JFXApp3 {
     stage = new JFXApp3.PrimaryStage() {
       title = "NETTUNIT"
       scene = new Scene(root)
-
     }
   }
 }

@@ -1,35 +1,28 @@
 package nettunit
 
-import JixelAPIInterface.JixelInterface
 import JixelAPIInterface.Login.ECOSUsers
 import RabbitMQ.JixelEvent
 import RabbitMQ.Launchers.Jixel.JixelClientTest.jixel
 import RabbitMQ.Producer.JixelRabbitMQProducer
 import RabbitMQ.Serializer.JixelEventJsonSerializer
-import Utils.JixelUtil
 import javafx.beans.value.{ChangeListener, ObservableValue}
-import javafx.collections.{FXCollections, ObservableList}
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import net.liftweb.json.Extraction.decompose
-import net.liftweb.json.{DefaultFormats, JInt, JString, JValue, parse, prettyRender}
-import scalafx.application.Platform
-import scalafx.beans.property.{ReadOnlyStringWrapper, StringProperty}
+import net.liftweb.json._
 import scalafx.collections.ObservableBuffer
 import scalafx.embed.swing.SwingFXUtils
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.control._
 import scalafx.scene.image.{Image, ImageView}
 import scalafx.scene.input.{Clipboard, ClipboardContent}
-import scalafx.scene.shape.Circle
 import scalafxml.core.macros.sfxml
 import scalaj.http.{Http, HttpResponse}
 
-import java.io.{ByteArrayInputStream, File, FileInputStream}
+import java.io.{ByteArrayInputStream, FileInputStream}
 import java.net.{ConnectException, SocketTimeoutException}
 import java.sql.Timestamp
 import javax.imageio.ImageIO
-import scala.collection.mutable.ListBuffer
 
 case class ServiceTaskView(label: String, fullClassName: String)
 
@@ -327,7 +320,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
 
   @FXML private[nettunit] def onConvertGoalsToBPMN(event: ActionEvent): Unit = {
     val goals = new String(GoalSPECTextArea.getText.getBytes(), "UTF-8")
-    val connectionString = s"http://$getMUSAAddress:$getMUSAAddressPort/Goal2BPMN"
+    val connectionString = s"http://${getMUSAAddress()}:${getMUSAAddressPort()}/Goal2BPMN"
     val resultApply = Http(connectionString)
       .header("Content-Type", "text/plain")
       .postData(goals)
@@ -347,7 +340,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
   }
 
   def getUserTaskList(goals: String): Unit = {
-    val connectionString2 = s"http://$getMUSAAddress:$getMUSAAddressPort/UserTasks"
+    val connectionString2 = s"http://${getMUSAAddress()}:${getMUSAAddressPort()}/UserTasks"
     val resultApply2 = Http(connectionString2)
       .header("Content-Type", "text/plain")
       .postData(goals)
@@ -355,7 +348,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
   }
 
   def getServiceTaskList(goals: String): Unit = {
-    val connectionString2 = s"http://$getMUSAAddress:$getMUSAAddressPort/ServiceTasks"
+    val connectionString2 = s"http://${getMUSAAddress()}:${getMUSAAddressPort()}/ServiceTasks"
     val resultApply2 = Http(connectionString2)
       .header("Content-Type", "text/plain")
       .postData(goals)
@@ -363,7 +356,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
   }
 
   @FXML private[nettunit] def onDeployProcessToFlowable(event: ActionEvent): Unit = {
-    val connectionString = s"http://$getMUSAAddress:$getMUSAAddressPort/Deploy"
+    val connectionString = s"http://${getMUSAAddress()}:${getMUSAAddressPort()}/Deploy"
     val resultApply = Http(connectionString)
       .header("Content-Type", "text/xml")
       .postData(BPMNTextArea.getText)
@@ -380,7 +373,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
     val taskEndPoint = getNETTUNITCapabilityMatching(selectedTask.taskName)
     val taskID = selectedTask.taskID
     println(s"request complete task for ID [$taskID]")
-    val requestString = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/$taskEndPoint/$taskID"
+    val requestString = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/$taskEndPoint/$taskID"
     try {
       val resultApply = Http(requestString).postData("").asString
       new Alert(AlertType.Information, s"Result: ${
@@ -399,7 +392,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
       return
     }
     val selectedProcess = activePlansListView.getSelectionModel.getSelectedItems.get(0).processInstanceID
-    val requestStringUpdate = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/completed_tasks/$selectedProcess"
+    val requestStringUpdate = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/completed_tasks/$selectedProcess"
 
     try {
       val resultApply = Http(requestStringUpdate).method("GET").asString
@@ -448,7 +441,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
     activeTasksListView.getItems.clear()
     val selectedProcess = activePlansListView.getSelectionModel.getSelectedItems.get(0).processInstanceID
     if (!selectedProcess.isEmpty) {
-      val resultApply2 = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/task_list/${selectedProcess}").method("GET").asString
+      val resultApply2 = Http(s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/task_list/${selectedProcess}").method("GET").asString
       val ll = parse(resultApply2.body)
 
       val childrenName = (ll \\ "taskName").children
@@ -473,23 +466,8 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
     case "Declare alarm state" => "prefect/declare_alarm_state"
   }
 
-  //TODO delete
-  @FXML private[nettunit] def updateProcessListButtonClickOld(event: ActionEvent): Unit = {
-    /*val resultApply = Http(s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/incident_list/").method("GET").asString
-    if (resultApply.body != "[]") {
-      val strings = resultApply.body.substring(1, resultApply.body.length - 1)
-      val processID = strings.filter(!"\"".contains(_)).split(',')
-      activePlansListView.getItems.clear()
-      processID.foreach(pid => activePlansListView.getItems.add(pid))
-    } else {
-      activePlansListView.getItems.clear()
-    }
-
-    activeTasksListView.getItems.clear()*/
-  }
-
   @FXML private[nettunit] def updateProcessListButtonClick(event: ActionEvent): Unit = {
-    val request = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/incident_list_new/"
+    val request = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/incident_list_new/"
     val resultApply = Http(request).method("GET").asString
     val ll = parse(resultApply.body)
     processStatusListView.getItems.clear()
@@ -536,8 +514,8 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
 
   @FXML private[nettunit] def onSendJixelEventButtonClick(event: ActionEvent): Unit = {
     jixel = new JixelRabbitMQProducer
-    val testEvent3 = "{\n    \"id\": 3759,\n    \"description\": \"TEST MUSA DESC LIKE API OK\",\n    \"casualties\": null,\n    \"caller_name\": \"\",\n    \"caller_phone\": \"\",\n    \"incident_interface_fire\": false,\n    \"incident_distance\": null,\n    \"incident_msgtype_id\": 1,\n    \"incident_type_id\": 12,\n    \"incident_status_id\": 2,\n    \"incident_id\": 3758,\n    \"headline\": \"TEST MUSA HEADLINE\",\n    \"date\": \"2022-10-11T10:59:07+0200\",\n    \"completable\": false,\n    \"public\": false,\n    \"controllable_object\": {\n      \"id\": 74434,\n      \"created\": \"2022-10-11T10:59:07+0200\",\n      \"modified\": \"2022-10-11T14:45:43+0200\",\n      \"organisation_id\": 2242,\n      \"controllable_object_type_id\": 1,\n      \"last_activity_entry_id\": 16309,\n      \"check_code\": \"e431e7cf7d36c4cb944c94680947e5b1\",\n      \"emergency_scenario_id\": null,\n      \"emergency_scenario_activity\": 0,\n      \"create_user_id\": 9,\n      \"edit_user_id\": 9,\n      \"edit_organisation_id\": 2242,\n      \"deleted\": null,\n      \"organisation\": {\n        \"id\": 2242,\n        \"acronym\": \"IES\",\n        \"address\": \"Via Magna Grecia, Canalicchio, Tremestieri Etneo, Catania, Sicilia, 95030, Italia\",\n        \"district\": \"Tremestieri Etneo\",\n        \"cap\": \"\",\n        \"province\": \"\",\n        \"phone\": \"\",\n        \"mobile\": \"3405681233 (Personale), 3405681234 (Personale)\",\n        \"fax\": \"095355980 (Ufficio), 095355981 (Ufficio)\",\n        \"email\": \"mailsenzanotifica@gmail.com (Ufficio), mailconnotifica@gmail.com (Ufficio)\",\n        \"organisation_type_id\": 0,\n        \"actor_id\": 6681,\n        \"incident_creator\": false,\n        \"pec\": \"\",\n        \"geotype\": \"marker\",\n        \"coordinates\": \"15.0990811 37.5397058\",\n        \"feature_collection\": null,\n        \"deleted\": null,\n        \"photo\": null,\n        \"incident_default_tab\": -3,\n        \"loggable_object_id\": 15119,\n        \"controllable_object_interface_id\": 1118,\n        \"allow_badges\": false,\n        \"actor\": {\n          \"id\": 6681,\n          \"description\": \"IES Solutions SRL\",\n          \"actor_type_id\": 1,\n          \"interoperability_identifier\": null,\n          \"incident_type_group_id\": null,\n          \"deleted\": null,\n          \"description_with_actor_type\": \"IES Solutions SRL (Organizzazione)\",\n          \"actor_type_description\": \"Organizzazione\"\n        }\n      },\n      \"read\": 0,\n      \"received\": 0,\n      \"additional_parameter_value\": [],\n      \"creator_with_organisation\": \"Giovanni Francesco Catania (IES Solutions SRL)\",\n      \"additional_parameters\": [],\n      \"additional_parameters_for_list\": [],\n      \"attachment_file_names\": [],\n      \"attachment_url_accesses\": [],\n      \"creator_organisation\": \"IES - IES Solutions SRL\"\n    },\n    \"incident_status\": {\n      \"id\": 2,\n      \"description\": \"In Attesa/Accertamento\",\n      \"description_name\": \"Stato evento\",\n      \"description_value\": \"In Attesa/Accertamento\",\n      \"description_category\": \"Evento\",\n      \"additional_parameters\": []\n    },\n    \"incident_msgtype\": {\n      \"id\": 1,\n      \"enum_value\": \"Operativa\",\n      \"description_name\": \"Tipo di comunicazione evento\",\n      \"description_value\": \"Operativa\",\n      \"description_category\": \"Evento\",\n      \"additional_parameters\": [],\n      \"cap_description_value\": \"Request\"\n    },\n    \"_matchingData\": {\n      \"ControllableObjects\": {\n        \"id\": 74434,\n        \"created\": \"2022-10-11T10:59:07+0200\",\n        \"modified\": \"2022-10-11T14:45:43+0200\",\n        \"organisation_id\": 2242,\n        \"controllable_object_type_id\": 1,\n        \"last_activity_entry_id\": 16309,\n        \"check_code\": \"e431e7cf7d36c4cb944c94680947e5b1\",\n        \"emergency_scenario_id\": null,\n        \"emergency_scenario_activity\": 0,\n        \"create_user_id\": 9,\n        \"edit_user_id\": 9,\n        \"edit_organisation_id\": 2242,\n        \"deleted\": null,\n        \"additional_parameter_value\": [],\n        \"creator_with_organisation\": \"Giovanni Francesco Catania (IES Solutions SRL)\",\n        \"additional_parameters\": [],\n        \"additional_parameters_for_list\": [],\n        \"attachment_file_names\": [],\n        \"attachment_url_accesses\": [],\n        \"creator_organisation\": \"IES - IES Solutions SRL\"\n      },\n      \"ControllableObjectActors\": {\n        \"id\": 126416,\n        \"controllable_object_id\": 74434,\n        \"actor_id\": 6681,\n        \"controllable_object_actor_type_id\": 1,\n        \"validation_level_id\": null,\n        \"deleted\": null\n      },\n      \"Organisations\": {\n        \"id\": 2242,\n        \"acronym\": \"IES\",\n        \"address\": \"Via Magna Grecia, Canalicchio, Tremestieri Etneo, Catania, Sicilia, 95030, Italia\",\n        \"district\": \"Tremestieri Etneo\",\n        \"cap\": \"\",\n        \"province\": \"\",\n        \"phone\": \"\",\n        \"mobile\": \"3405681233 (Personale), 3405681234 (Personale)\",\n        \"fax\": \"095355980 (Ufficio), 095355981 (Ufficio)\",\n        \"email\": \"mailsenzanotifica@gmail.com (Ufficio), mailconnotifica@gmail.com (Ufficio)\",\n        \"organisation_type_id\": 0,\n        \"actor_id\": 6681,\n        \"incident_creator\": false,\n        \"pec\": \"\",\n        \"geotype\": \"marker\",\n        \"coordinates\": \"15.0990811 37.5397058\",\n        \"feature_collection\": null,\n        \"deleted\": null,\n        \"photo\": null,\n        \"incident_default_tab\": -3,\n        \"loggable_object_id\": 15119,\n        \"controllable_object_interface_id\": 1118,\n        \"allow_badges\": false\n      },\n      \"Actors\": {\n        \"id\": 6681,\n        \"description\": \"IES Solutions SRL\",\n        \"actor_type_id\": 1,\n        \"interoperability_identifier\": null,\n        \"incident_type_group_id\": null,\n        \"deleted\": null,\n        \"description_with_actor_type\": \"IES Solutions SRL (Organizzazione)\",\n        \"actor_type_description\": \"Organizzazione\"\n      }\n    },\n    \"is_user_recipient\": true,\n    \"updates\": 2,\n    \"entity_type\": \"Evento\",\n    \"entity_description\": \"3759 - TEST MUSA HEADLINE\",\n    \"instructions\": null\n  }"
-    val parsedJixelEvent = JixelEventJsonSerializer.fromJson(testEvent3).asInstanceOf[JixelEvent]
+    val event_3760 = "{\n  \"id\": 3760,\n  \"description\": \"descrizione\",\n  \"casualties\": null,\n  \"caller_name\": null,\n  \"caller_phone\": null,\n  \"incident_interface_fire\": false,\n  \"incident_distance\": null,\n  \"incident_id\": null,\n  \"headline\": \"oggetto\",\n  \"date\": \"2022-10-26T09:48:21+0200\",\n  \"completable\": false,\n  \"public\": false,\n  \"incident_subtype\": null,\n  \"incident_severity\": {\n    \"id\": 4,\n    \"description\": \"Minor\",\n    \"_locale\": \"en-GB\",\n    \"cap_description_value\": \"Minor\"\n  },  \n  \"incident_urgency\": {\n    \"id\": 3,\n    \"description\": \"Past\",\n    \"_locale\": \"en-GB\",\n    \"cap_description_value\": \"Past\"\n  },\n  \"incident_status\": {\n    \"id\": 1,\n    \"description\": \"Reported\",\n    \"_locale\": \"en-GB\",\n    \"description_name\": \"Event status\",\n    \"description_value\": \"Reported\",\n    \"description_category\": \"Event\",\n    \"additional_parameters\": []\n  },\n  \"incident_type\": {\n    \"id\": 100,\n    \"description\": \"Alluvione\",\n    \"color\": null,\n    \"icon\": null,\n    \"app_enabled\": false,\n    \"order\": null,\n    \"deleted\": null,\n    \"default_value\": true,\n    \"category\": \"Met\",\n    \"interoperability_incident_type_id\": 2,\n    \"post_emergency\": 0,\n    \"_locale\": \"en-GB\",\n    \"description_name\": \"Event type\",\n    \"description_value\": \"Alluvione\",\n    \"description_category\": \"Event\",\n    \"additional_parameters\": [],\n    \"subtypes\": \"\",\n    \"cap_type_description\": \"Flood\"\n  },  \n  \"incident_msgtype\": {\n    \"id\": 5,\n    \"enum_value\": \"Pre-operational\",\n    \"_locale\": \"en-GB\",\n    \"description_name\": \"Event communication type\",\n    \"description_value\": \"Pre-operational\",\n    \"description_category\": \"Event\",\n    \"additional_parameters\": [],\n    \"cap_description_value\": null\n  },\n  \"controllable_object\": {\n    \"id\": 75389,\n    \"created\": \"2022-10-26T09:48:21+0200\",\n    \"modified\": \"2022-10-26T09:48:21+0200\",\n    \"organisation_id\": 2242,\n    \"controllable_object_type_id\": 1,\n    \"last_activity_entry_id\": 16311,\n    \"check_code\": \"d422c98670a3cbf55b04077fad191b95\",\n    \"emergency_scenario_id\": null,\n    \"emergency_scenario_activity\": 0,\n    \"create_user_id\": 9,\n    \"edit_user_id\": 9,\n    \"edit_organisation_id\": 2242,\n    \"deleted\": null,\n    \"locations\": [\n      {\n        \"id\": 57242,\n        \"description\": \"Via Provinciale, Monreale, Palermo, Sicilia\",\n        \"geotype\": \"marker\",\n        \"coordinates\": \"13.22522 38.04631\",\n        \"is_strategic_positions\": null,\n        \"code\": null,\n        \"controllable_object_id\": 75389,\n        \"feature_collection\": null,\n        \"road\": \"Via Provinciale\",\n        \"town\": \"Monreale\",\n        \"county\": \"Palermo\",\n        \"postcode\": \"90046\",\n        \"state\": \"Sicilia\",\n        \"country\": \"\",\n        \"loggable_object_id\": 23903,\n        \"coordinates_ne\": \"38.04631 13.22522\",\n        \"latitude\": \"38.04630972668314\",\n        \"longitude\": \"13.22521524877168\"\n      }\n    ],\n    \"additional_parameter_value\": [],\n    \"creator_with_organisation\": \"Giovanni Francesco Luigi Catania (IES Solutions SRL)\",\n    \"additional_parameters\": [],\n    \"additional_parameters_for_list\": [],\n    \"attachment_file_names\": {\n      \"d67e1dc241ae67d9963e6214cddc233a\": \"Scheda Evento Emer2.pdf\"\n    },\n    \"attachment_url_accesses\": {\n      \"\": \"Scheda Evento Emer2.pdf\"\n    },\n    \"creator_organisation\": \"IES - IES Solutions SRL\"\n  },\n  \"weblink\": \"https://lambda.dev.ies.solutions/incidents/view/3760\",\n  \"recipients\": [],\n  \"updates\": 0,\n  \"entity_type\": \"Event\",\n  \"entity_description\": \"3760 - oggetto\",\n  \"instructions\": null\n}"
+    val parsedJixelEvent = JixelEventJsonSerializer.fromJson(event_3760).asInstanceOf[JixelEvent]
 
     processStatusListView.getItems.clear()
 
@@ -597,13 +575,13 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
   def submitUndoServiceTaskFailure(service: ServiceTaskView): Unit = {
     //First tell to flowable
     failingTaskName = Some(service)
-    val connectionURL = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/undo_fail/${service.fullClassName}"
+    val connectionURL = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/undo_fail/${service.fullClassName}"
     Http(connectionURL)
       .header("Content-Type", "text/xml")
       .postData("").asString
 
     //Then to musa, so that next plan definition can include the restored capability
-    val connectionString = s"http://$getMUSAAddress:$getMUSAAddressPort/RestoreCapability"
+    val connectionString = s"http://${getMUSAAddress()}:${getMUSAAddressPort()}/RestoreCapability"
     Http(connectionString)
       .header("Content-Type", "text/plain")
       .postData(service.fullClassName).asString
@@ -611,7 +589,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
 
   def submitServiceTaskFailure(service: ServiceTaskView): HttpResponse[String] = {
     failingTaskName = Some(service)
-    val connectionURL = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/fail/${service.fullClassName}"
+    val connectionURL = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/fail/${service.fullClassName}"
     Http(connectionURL)
       .header("Content-Type", "text/xml")
       .postData("")
@@ -643,7 +621,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
     // React to user's selectioon
     result match {
       case Some(ButtonType.OK) => {
-        val connectionURL = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/clearDeployments/"
+        val connectionURL = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/clearDeployments/"
         val resultApply = Http(connectionURL)
           .header("Content-Type", "text/xml")
           .postData("")
@@ -663,7 +641,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
     }
     val selectedProcess = activePlansListView.getSelectionModel.getSelectedItems.get(0)
 
-    val requestStringUpdate = s"http://$getFlowableAddress:$getFlowableAddressPort/NETTUNIT/get_diagram/"
+    val requestStringUpdate = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/get_diagram/"
     val processInstanceDetailJSON = prettyRender(decompose(selectedProcess))
 
     try {

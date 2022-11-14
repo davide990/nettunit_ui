@@ -1,6 +1,6 @@
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
-ThisBuild / scalaVersion := "2.13.9"
+ThisBuild / scalaVersion := "2.13.6"
 
 lazy val root = (project in file("."))
   .settings(
@@ -41,3 +41,5 @@ resolvers += Resolver.mavenLocal
 
 // Fork a new JVM for 'run' and 'test:run', to avoid JavaFX double initialization problems
 fork := true
+
+//addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.15.0")
