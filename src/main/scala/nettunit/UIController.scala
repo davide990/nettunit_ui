@@ -10,6 +10,7 @@ import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import net.liftweb.json.Extraction.decompose
 import net.liftweb.json._
+import scalafx.application.Platform
 import scalafx.collections.ObservableBuffer
 import scalafx.embed.swing.SwingFXUtils
 import scalafx.scene.control.Alert.AlertType
@@ -31,18 +32,17 @@ case class UserTaskDetail(taskID: String, taskName: String, processID: String)
 case class ProcessInstanceDetail(name: String, processInstanceID: String, processDefinitionName: String, processDefinitionVersion: Int)
 
 @sfxml
-class UIController(private val processStatusListView: ListView[UserTaskDetail],
+class UIController(private val completePlansListView: ListView[ProcessInstanceDetail],
+                   private val pendingMessagesCountTextField: TextField,
+                   private val processStatusListView: ListView[UserTaskDetail],
                    private val flowableRadioButton: RadioButton,
                    private val activitiRadioButton: RadioButton,
                    private val activePlansListView: ListView[ProcessInstanceDetail],
                    private val activeTasksListView: ListView[UserTaskDetail],
-
-
                    private val submitServiceTaskFailureButton: Button,
                    private val mareImageView: ImageView,
                    private val jixelImageView: ImageView,
                    private val nettunitHautImageView: ImageView,
-
                    private val serviceTaskListView: ListView[ServiceTaskView],
                    private val actInstanceHITableView: TableView[FlowableActInstHistoricRecord],
                    private val actInstHi_idColumn: TableColumn[FlowableActInstHistoricRecord, String],
@@ -93,22 +93,12 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
                    private val processDef_TenantID: TableColumn[FlowableProcessDefRecord, String],
                    private val nettunitImageView: ImageView,
                    private val processImageView: ImageView,
-                   private val sendJixelEventButton: Button,
-                   private val planImageView: ImageView,
-                   private val taskTypeListView: ListView[String],
-
-                   private val processIDTextField: TextField,
                    private val MUSAAddressTextField: TextField,
                    private val MUSAPortTextField: TextField,
                    private val deployToFlowableButton: Button,
-                   private val convertGoalSPECButton: Button,
                    private val GoalSPECTextArea: TextArea,
                    private val BPMNTextArea: TextArea,
-
-                   private val applyIncidentButton: Button,
-                   private val completeTaskButton: Button,
                    private val emergencyTypeField: TextField,
-                   private val failTaskButton: Button,
                    private val operatorNameField: TextField,
                    private val flowableAddressTextField: TextField,
                    private val flowablePortTextField: TextField,
@@ -129,13 +119,27 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
 
   activePlansListView.getSelectionModel.selectedItemProperty().addListener(new ChangeListener[ProcessInstanceDetail] {
     override def changed(observableValue: ObservableValue[_ <: ProcessInstanceDetail], oldValue: ProcessInstanceDetail, newValue: ProcessInstanceDetail): Unit = {
+      //completePlansListView.getSelectionModel.clearSelection()
+
+
+      Platform.runLater(() => completePlansListView.getSelectionModel.select(-1))
+
       updateTaskListButtonClick(null)
       updateCompletedTasks(null)
+      updateDiagram(null)
+    }
+  })
+
+  completePlansListView.getSelectionModel.selectedItemProperty().addListener(new ChangeListener[ProcessInstanceDetail] {
+    override def changed(observableValue: ObservableValue[_ <: ProcessInstanceDetail], oldValue: ProcessInstanceDetail, newValue: ProcessInstanceDetail): Unit = {
+      Platform.runLater(() => activePlansListView.getSelectionModel.select(-1))
+
+      updateDiagram()
     }
   })
 
   processStatusListView.cellFactory = {
-    a: ListView[UserTaskDetail] => {
+    _: ListView[UserTaskDetail] => {
       val cell = new ListCell[UserTaskDetail]
       cell.item.onChange { (a, b, newValue) => {
         if (newValue != null) {
@@ -145,7 +149,6 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
               cell.style = ".list-cell {\n    -fx-text-fill: white; /* 5 */\n    -fx-background-radius: 4 4 4 4;\n    -fx-border-radius: 2 2 2 2;\n    -fx-background-color: darkred;\n}"
             }
           }
-          //cell.style = ".list-cell {\n    -fx-text-fill: black; /* 5 */\n    -fx-background-radius: 4 4 4 4;\n    -fx-border-radius: 2 2 2 2;\n    -fx-background-color: #FFFFBF;\n}"
         } else {
           cell.text = null
           cell.style = null
@@ -166,7 +169,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
   })
 
   serviceTaskListView.cellFactory = {
-    a: ListView[ServiceTaskView] => {
+    _: ListView[ServiceTaskView] => {
       val cell = new ListCell[ServiceTaskView]
       cell.item.onChange { (a, b, newValue) => {
         if (newValue != null) {
@@ -181,7 +184,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
   }
 
   activeTasksListView.cellFactory = {
-    p: ListView[UserTaskDetail] => {
+    _: ListView[UserTaskDetail] => {
       val cell = new ListCell[UserTaskDetail]
       cell.item.onChange { (_, _, str) =>
         if (str != null) {
@@ -195,11 +198,26 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
   }
 
   activePlansListView.cellFactory = {
-    p: ListView[ProcessInstanceDetail] => {
+    _: ListView[ProcessInstanceDetail] => {
       val cell = new ListCell[ProcessInstanceDetail]
       cell.item.onChange { (_, _, str) =>
         if (str != null) {
           cell.text = s"${str.processDefinitionName} [version: ${str.processDefinitionVersion}; ID: ${str.processInstanceID}]"
+        } else {
+          cell.text = null
+          cell.style = null
+        }
+      }
+      cell
+    }
+  }
+
+  completePlansListView.cellFactory = {
+    _: ListView[ProcessInstanceDetail] => {
+      val cell = new ListCell[ProcessInstanceDetail]
+      cell.item.onChange { (_, _, str) =>
+        if (str != null) {
+          cell.text = s"${str.processDefinitionName} [ID: ${str.processInstanceID}]"
         } else {
           cell.text = null
           cell.style = null
@@ -266,21 +284,13 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
   actInstHi_delete_reasonColumn.cellValueFactory = _.value.delete_reason
 
   //val processImage = new Image(new FileInputStream(getClass.getResource("/process.png").getFile))
+
+  // in case of null exception, check if the resources folder is marked as "resource" folder
   val cooperationTransfrontaliereImage = new Image(new FileInputStream(getClass.getResource("/banners/nettunitHaut.png").getFile))
   nettunitHautImageView.setImage(cooperationTransfrontaliereImage)
   mareImageView.setImage(new Image(new FileInputStream(getClass.getResource("/banners/slide-1.1.png").getFile)))
   jixelImageView.setImage(new Image(new FileInputStream(getClass.getResource("/jixel.png").getFile)))
   nettunitImageView.setImage(new Image(new FileInputStream(getClass.getResource("/nettunit.png").getFile)))
-
-  val acceptIconFile = getClass.getResource("/icons/accept.png").getFile
-  val acceptHumanIconFile = getClass.getResource("/icons/settings.png").getFile
-  val pendingIconFile = getClass.getResource("/icons/pending.png").getFile
-  val warningIconFile = getClass.getResource("/icons/warning.png").getFile
-
-  val acceptIcon = new Image(new FileInputStream(acceptIconFile))
-  val acceptHumanIcon = new Image(new FileInputStream(acceptHumanIconFile))
-  val pendingIcon = new Image(new FileInputStream(pendingIconFile))
-  val warningIcon = new Image(new FileInputStream(warningIconFile))
 
   var failingTaskName: Option[ServiceTaskView] = None
 
@@ -290,9 +300,6 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
   var eclipseBPMNEditorReadyBPMNString = ""
 
   val login = ECOSUsers.davide_login
-
-  private def imageFromResource(name: String) =
-    new ImageView(new Image(getClass.getClassLoader.getResourceAsStream(name)))
 
   @FXML private[nettunit] def applyEmergencyPlan(event: ActionEvent): Unit = {
     val address = flowableAddressTextField.getText match {
@@ -304,10 +311,12 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
       case _ => flowablePortTextField.getText
     }
 
-    val body = s"{\n  \"emergencyPlanID\":\"$planIDField.getText\",\n  \"empName\":\"$operatorNameField.getText\",\n  \"requestDescription\":\"$emergencyTypeField.getText\"\n}"
+    //val body = s"{\n  \"emergencyPlanID\":\"$planIDField.getText()\",\n  \"empName\":\"$operatorNameField.getText()\",\n  \"requestDescription\":\"$emergencyTypeField.getText()\"\n}"
+
+    val body = "{\nemergencyPlanID: %s,\nempName: %s,\nrequestDescription: %s\n}".format(planIDField.getText(), operatorNameField.getText(), emergencyTypeField.getText())
 
     try {
-      val resultApply = Http(s"http://$address:$port/NETTUNIT/incident/apply")
+      Http(s"http://$address:$port/NETTUNIT/incident/apply")
         .postData(body)
         .header("Content-Type", "application/json").asString
       new Alert(AlertType.Information, s"Success").showAndWait()
@@ -401,7 +410,7 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
       val childrenName = (ll \\ "taskName").children
       val childrenID = (ll \\ "taskID").children
       val childrenProcessID = (ll \\ "processID").children
-      for (i <- 0 until childrenName.size) {
+      for (i <- childrenName.indices) {
         val taskName = childrenName(i).asInstanceOf[JString].s
         val taskID = childrenID(i).asInstanceOf[JString].s
         val processID = childrenProcessID(i).asInstanceOf[JString].s
@@ -440,21 +449,23 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
     }
     activeTasksListView.getItems.clear()
     val selectedProcess = activePlansListView.getSelectionModel.getSelectedItems.get(0).processInstanceID
-    if (!selectedProcess.isEmpty) {
-      val resultApply2 = Http(s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/task_list/${selectedProcess}").method("GET").asString
-      val ll = parse(resultApply2.body)
-
-      val childrenName = (ll \\ "taskName").children
-      val childrenID = (ll \\ "taskID").children
-      val childrenProcessID = (ll \\ "processID").children
-      for (i <- 0 until childrenName.size) {
-        val taskName = childrenName(i).asInstanceOf[JString].s
-        val taskID = childrenID(i).asInstanceOf[JString].s
-        val processID = childrenProcessID(i).asInstanceOf[JString].s
-        val ut = UserTaskDetail(taskID, taskName, processID)
-        activeTasksListView.getItems.add(ut)
-      }
+    if (selectedProcess.isEmpty) {
+      return
     }
+    val resultApply2 = Http(s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/task_list/${selectedProcess}").method("GET").asString
+    val ll = parse(resultApply2.body)
+
+    val childrenName = (ll \\ "taskName").children
+    val childrenID = (ll \\ "taskID").children
+    val childrenProcessID = (ll \\ "processID").children
+    for (i <- childrenName.indices) {
+      val taskName = childrenName(i).asInstanceOf[JString].s
+      val taskID = childrenID(i).asInstanceOf[JString].s
+      val processID = childrenProcessID(i).asInstanceOf[JString].s
+      val ut = UserTaskDetail(taskID, taskName, processID)
+      activeTasksListView.getItems.add(ut)
+    }
+
   }
 
   def getNETTUNITCapabilityMatching(capName: String): String = capName match {
@@ -466,12 +477,11 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
     case "Declare alarm state" => "prefect/declare_alarm_state"
   }
 
-  @FXML private[nettunit] def updateProcessListButtonClick(event: ActionEvent): Unit = {
-    val request = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/incident_list_new/"
+  def updateCompletedPlansList(): Unit = {
+    val request = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/terminated_incident_list/"
     val resultApply = Http(request).method("GET").asString
     val ll = parse(resultApply.body)
-    processStatusListView.getItems.clear()
-    activePlansListView.getItems.clear()
+    completePlansListView.getItems.clear()
     val childrenProcessName = (ll \\ "name").children
     val childrenProcessInstanceID = (ll \\ "processInstanceID").children
     val childrenProcessDefName = (ll \\ "processDefinitionName").children
@@ -481,7 +491,35 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
       processImageView.setImage(null)
     }
 
-    for (i <- 0 until childrenProcessName.size) {
+    for (i <- childrenProcessName.indices) {
+      val processName = childrenProcessName(i).asInstanceOf[JString].s
+      val processInstanceID = childrenProcessInstanceID(i).asInstanceOf[JString].s
+      val processDefName = childrenProcessDefName(i).asInstanceOf[JString].s
+      val processDefVersion = childrenProcessDefVersion(i).asInstanceOf[JInt].num
+
+      val details = ProcessInstanceDetail(processName, processInstanceID, processDefName, processDefVersion.intValue)
+      completePlansListView.getItems.add(details)
+    }
+
+  }
+
+  @FXML private[nettunit] def updateProcessListButtonClick(event: ActionEvent): Unit = {
+    val request = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/incident_list_new/"
+    val resultApply = Http(request).method("GET").asString
+    val ll = parse(resultApply.body)
+    activePlansListView.getItems.clear()
+    activeTasksListView.getItems.clear()
+
+    val childrenProcessName = (ll \\ "name").children
+    val childrenProcessInstanceID = (ll \\ "processInstanceID").children
+    val childrenProcessDefName = (ll \\ "processDefinitionName").children
+    val childrenProcessDefVersion = (ll \\ "processDefinitionVersion").children
+
+    if (childrenProcessDefName.isEmpty) {
+      processImageView.setImage(null)
+    }
+
+    for (i <- childrenProcessName.indices) {
       val processName = childrenProcessName(i).asInstanceOf[JString].s
       val processInstanceID = childrenProcessInstanceID(i).asInstanceOf[JString].s
       val processDefName = childrenProcessDefName(i).asInstanceOf[JString].s
@@ -490,6 +528,9 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
       val details = ProcessInstanceDetail(processName, processInstanceID, processDefName, processDefVersion.intValue)
       activePlansListView.getItems.add(details)
     }
+    updateCompletedPlansList()
+    updateCompletedTasks(null)
+    //updateDiagram(null)
   }
 
   private def getFlowableAddressPort(): String = flowablePortTextField.getText match {
@@ -633,6 +674,31 @@ class UIController(private val processStatusListView: ListView[UserTaskDetail],
     }
 
 
+  }
+
+  @FXML private[nettunit] def updateDiagram(): Unit = {
+    if (completePlansListView.getSelectionModel.getSelectedItems.isEmpty) {
+      return
+    }
+    val selectedProcess = completePlansListView.getSelectionModel.getSelectedItems.get(0)
+
+    val requestStringUpdate = s"http://${getFlowableAddress()}:${getFlowableAddressPort()}/NETTUNIT/get_diagram/"
+    val processInstanceDetailJSON = prettyRender(decompose(selectedProcess))
+
+    try {
+      val resultApply = Http(requestStringUpdate)
+        .header("Content-Type", "application/json")
+        .postData(processInstanceDetailJSON).asBytes
+      val is = new ByteArrayInputStream(resultApply.body)
+      val bi = ImageIO.read(is)
+      val im = SwingFXUtils.toFXImage(bi, null)
+      processImageView.setFitWidth(im.getWidth)
+      processImageView.setFitHeight(im.getHeight)
+      processImageView.setImage(im)
+    } catch {
+      case _: SocketTimeoutException => new Alert(AlertType.Error, s"Socket timeout").showAndWait()
+      case ex: Exception => println("Unable to retrieve diagram for " + selectedProcess + "; reason: " + ex)
+    }
   }
 
   @FXML private[nettunit] def updateDiagram(event: ActionEvent): Unit = {
