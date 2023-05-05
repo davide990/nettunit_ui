@@ -286,9 +286,9 @@ class UIController(private val completePlansListView: ListView[ProcessInstanceDe
   //val processImage = new Image(new FileInputStream(getClass.getResource("/process.png").getFile))
 
   // in case of null exception, check if the resources folder is marked as "resource" folder
-  val cooperationTransfrontaliereImage = new Image(new FileInputStream(getClass.getResource("/banners/nettunitHaut.png").getFile))
+  val cooperationTransfrontaliereImage = new Image(new FileInputStream(getClass.getResource("/nettunitHaut.png").getFile))
   nettunitHautImageView.setImage(cooperationTransfrontaliereImage)
-  mareImageView.setImage(new Image(new FileInputStream(getClass.getResource("/banners/slide-1.1.png").getFile)))
+  mareImageView.setImage(new Image(new FileInputStream(getClass.getResource("/slide-1.1.png").getFile)))
   jixelImageView.setImage(new Image(new FileInputStream(getClass.getResource("/jixel.png").getFile)))
   nettunitImageView.setImage(new Image(new FileInputStream(getClass.getResource("/nettunit.png").getFile)))
 

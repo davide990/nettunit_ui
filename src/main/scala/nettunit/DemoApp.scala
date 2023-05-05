@@ -11,9 +11,13 @@ import java.io.IOException
 object DemoApp extends JFXApp3 {
   override def start(): Unit = {
 
-    val resource = getClass.getResource("demoUI.fxml")
+    var resource = getClass.getResource("../demoUI.fxml")
+
     if (resource == null) {
-      throw new IOException("Cannot load resource: demoUI.fxml")
+      resource = getClass.getResource("/demoUI.fxml")
+      if (resource == null) {
+        throw new IOException("Cannot load resource: demoUI.fxml")
+      }
     }
 
     val root = FXMLView(resource, NoDependencyResolver)

@@ -11,13 +11,15 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", 
 
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", _*) => MergeStrategy.discard
-  case _ => MergeStrategy.first
+  case _ => MergeStrategy.last//first
 }
 
 Compile / resourceDirectory := (Compile / scalaSource).value
 libraryDependencies ++= Seq(
-  "org.scalafx" %% "scalafx" % "18.0.1-R28",
-  "org.scalafx" %% "scalafxml-core-sfx8" % "0.5",
+  //"org.scalafx" %% "scalafx" % "18.0.1-R28",
+  //"org.scalafx" %% "scalafxml-core-sfx8" % "0.5",
+  "org.scalafx" % "scalafx_2.12" % "20.0.0-R31",
+  "org.scalafx" % "scalafxml-core-sfx8_2.12" % "0.5",
   // https://mvnrepository.com/artifact/org.scalaj/scalaj-http
   "org.scalaj" %% "scalaj-http" % "2.4.2",
   "net.liftweb" %% "lift-json" % "3.0.1",
