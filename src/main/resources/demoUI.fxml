@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nettunit.UIController">
+   <children>
+      <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="694.0" prefWidth="850.0" tabClosingPolicy="UNAVAILABLE">
+          <tabs>
+            <Tab text="NETTUNIT">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: white;">
+                     <children>
+                        <ImageView fx:id="nettunitHautImageView" fitHeight="399.0" fitWidth="552.0" layoutX="159.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
+                            <!--<image>
+                               <Image url="@/nettunitHaut.png" />
+                           </image>-->
+                        </ImageView>
+                        <ImageView fx:id="mareImageView" fitHeight="214.0" fitWidth="850.0" layoutY="447.0" pickOnBounds="true">
+                            <!--<image>
+                               <Image url="@/slide-1.1.png" />
+                           </image>-->
+                        </ImageView>
+                        <Label layoutX="182.0" layoutY="246.0" prefHeight="171.0" prefWidth="486.0" style="-fx-background-color: rgba(0, 0, 0, 0)rgba(0, 0, 0, 0);" text="Le projet NETTUNIT vise à développer une plateforme complètement opérationnelle avec l’utilisation des alertes météorologiques, des alertes sur la pollution atmosphériques et la pollution marine destinées en particulier aux services de la Protection Civile, aux services de la santé locale et autres services d’intervention Italiens et Tunisien afin de collaborer ensemble pour une éventuelle intervention." textAlignment="JUSTIFY" wrapText="true" />
+                        <VBox layoutX="182.0" layoutY="399.0" prefHeight="157.0" prefWidth="552.0" spacing="8.0">
+                           <children>
+                              <Label text="Ce prototype a été développé par Davide Andrea Guastella (ICAR-CNR)" />
+                              <Label text="MUSA a été conçu et développé par Luca Sabatucci (ICAR-CNR) et Massimo Cossentino (ICAR-CNR)" />
+                              <Label text="JIXEL est un produit de IES Solutions SRL" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+            <Tab text="Process definition">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Label layoutX="14.0" layoutY="31.0" text="Write your GoalSPEC definition here" />
+                        <TextArea fx:id="GoalSPECTextArea" layoutX="14.0" layoutY="52.0" prefHeight="481.0" prefWidth="332.0" promptText="Hello" text="GOAL Managing_emergency IS AND OF {&#10;&#10;GOAL send_team_to_evaluate : WHEN emergency_location(refinery) AND NOT assessed_emergency THEN THE safety_manager ROLE SHALL ADDRESS FINALLY alarm_state(attention)&#10;&#10;GOAL activate_internal_security_plan : WHEN alarm_state(attention) THEN THE plant_operator ROLE SHALL ADDRESS FINALLY internal_plan_active(active)&#10;&#10;GOAL notify_competent_body_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(prefect, attention) AND informed_authority(mayor, attention)&#10;&#10;GOAL inform_technical_rescue_organisation_internal_plan : WHEN internal_plan_active(active) AND alarm_state(attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(commander_fire_brigade,attention)&#10;&#10;GOAL decide_response_type : WHEN informed(commander_fire_brigade, attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY fire_brigade_assessment_done(attention)&#10;&#10;GOAL prepare_tech_report : WHEN fire_brigade_assessment_done(attention) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY tech_report(fire,attention)&#10;&#10;GOAL keep_update_involved_personnel : WHEN tech_report(fire,attention) THEN THE nettunit ROLE SHALL ADDRESS FINALLY coordinated_firefighter_intervention AND second_explosion&#10;&#10;GOAL declare_pre_alert_state : WHEN coordinated_firefighter_intervention AND second_explosion THEN THE nettunit ROLE SHALL ADDRESS FINALLY alarm_state(pre_alert)&#10;&#10;GOAL inform_technical_rescue_organisation_alert : WHEN alarm_state(pre_alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(n118, pre_alert) AND informed(ASP, pre_alert) AND informed(ARPA, pre_alert)&#10;&#10;GOAL evaluate_fire_radiant_energy : WHEN informed(ARPA, pre_alert) AND alarm_state(pre_alert) THEN THE ARPA ROLE SHALL ADDRESS FINALLY evaluated_fire_radiant_energy&#10;&#10;GOAL declare_alarm_state : WHEN evaluated_fire_radiant_energy AND alarm_state(pre_alert) THEN THE commander_fire_brigade ROLE SHALL ADDRESS FINALLY alarm_state(alert)&#10;&#10;GOAL ensure_presence_of_qualified_personnel : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed(civil_protection,alert) AND informed_authority(municipality, alert)&#10;&#10;GOAL ensure_presence_of_representative : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY informed_authority(questor, alert)&#10;&#10;GOAL do_crossborder_communication : WHEN alarm_state(alert) THEN THE nettunit ROLE SHALL ADDRESS FINALLY crossborder_inform&#10;}">
+                           <font>
+                              <Font name="Monaco" size="10.0" />
+                           </font>
+                        </TextArea>
+                        <TextArea fx:id="BPMNTextArea" layoutX="466.0" layoutY="48.0" prefHeight="447.0" prefWidth="370.0">
+                           <font>
+                              <Font name="Courier New" size="12.0" />
+                           </font>
+                        </TextArea>
+                        <Label layoutX="466.0" layoutY="31.0" text="BPMN process definition" />
+                        <Button fx:id="convertGoalSPECButton" layoutX="352.0" layoutY="195.0" mnemonicParsing="false" onAction="#onConvertGoalsToBPMN" prefHeight="46.0" prefWidth="107.0" text="Orchestrate solution" textAlignment="CENTER" wrapText="true" />
+                        <Button fx:id="deployToFlowableButton" layoutX="552.0" layoutY="595.0" mnemonicParsing="false" onAction="#onDeployProcessToFlowable" prefHeight="26.0" prefWidth="282.0" text="Deploy Process to Flowable" />
+                        <TextField fx:id="MUSAAddressTextField" layoutX="259.0" layoutY="595.0" prefHeight="26.0" prefWidth="284.0" promptText="localhost" />
+                        <TextField fx:id="MUSAPortTextField" layoutX="259.0" layoutY="627.0" prefHeight="26.0" prefWidth="282.0" promptText="8081" />
+                        <Label layoutX="173.0" layoutY="600.0" text="MUSA Address" />
+                        <Label layoutX="196.0" layoutY="632.0" text="MUSA Port" />
+                        <Button layoutX="550.0" layoutY="627.0" mnemonicParsing="false" onAction="#clearProcessDefButtonClick" prefHeight="26.0" prefWidth="286.0" style="-fx-background-color: darkred;" text="Clear previous process definitions" textFill="WHITE" />
+                        <Button layoutX="552.0" layoutY="562.0" mnemonicParsing="false" onAction="#copyProcessToClipboardButtonClick" prefHeight="26.0" prefWidth="280.0" text="Copy BPMN to clipboard" />
+                        <HBox alignment="CENTER" layoutX="549.0" layoutY="530.0" prefHeight="28.0" prefWidth="280.0" spacing="50.0">
+                           <children>
+                              <RadioButton fx:id="flowableRadioButton" mnemonicParsing="false" onAction="#flowableRadioButtonCheck" selected="true" text="Flowable" />
+                              <RadioButton fx:id="activitiRadioButton" mnemonicParsing="false" onAction="#activityRadioButtonCheck" text="Activiti" />
+                           </children>
+                        </HBox>
+                        <Label layoutX="526.0" layoutY="536.0" prefHeight="17.0" prefWidth="64.0" text="XML tags" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+              <Tab text="Apply emergency plan">
+                  <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                          <children>
+                              <Button fx:id="applyIncidentButton" layoutX="170.0" layoutY="292.0" mnemonicParsing="false" onAction="#applyEmergencyPlan" prefHeight="40.0" prefWidth="206.0" text="New Emergency Plan" />
+                        <GridPane layoutX="38.0" layoutY="25.0" prefHeight="261.0" prefWidth="338.0">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="161.0" minWidth="10.0" prefWidth="103.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="235.0" minWidth="10.0" prefWidth="235.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Flowable address" />
+                              <Label text="Flowable port" GridPane.rowIndex="1" />
+                              <TextField fx:id="flowableAddressTextField" promptText="localhost" GridPane.columnIndex="1" />
+                              <TextField fx:id="flowablePortTextField" promptText="8080" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Label text="Emergency ID" GridPane.rowIndex="2" />
+                                    <TextField fx:id="planIDField" text="NETTUNITProcess" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <Label text="Operator" GridPane.rowIndex="3" />
+                                    <TextField fx:id="operatorNameField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <Label text="Emergency type" GridPane.rowIndex="4" />
+                                    <TextField fx:id="emergencyTypeField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                           </children>
+                        </GridPane>
+                        <Button fx:id="sendJixelEventButton" defaultButton="true" layoutX="171.0" layoutY="380.0" mnemonicParsing="false" onAction="#onSendJixelEventButtonClick" prefHeight="40.0" prefWidth="205.0" text="Send JIXEL event to MUSA" />
+                        <Separator layoutX="56.0" layoutY="349.0" prefHeight="17.0" prefWidth="318.0" />
+                        <ImageView fx:id="jixelImageView" fitHeight="42.0" fitWidth="69.0" layoutX="89.0" layoutY="381.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@/jixel.png" />
+                           </image>
+                        </ImageView>
+                          </children>
+                  </AnchorPane>
+                  </content>
+              </Tab>
+              <Tab text="Emergency plan operations">
+                  <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                          <children>
+                              <Label layoutX="64.0" layoutY="289.0" text="Available tasks" />
+                              <Button fx:id="completeTaskButton" layoutX="687.0" layoutY="378.0" mnemonicParsing="false" onAction="#completeTask" style="-fx-background-color: darkgreen;" text="Simulate Human Task" textFill="WHITE" textOverrun="CLIP" />
+                              <Button fx:id="failTaskButton" layoutX="532.0" layoutY="378.0" mnemonicParsing="false" onAction="#failTask" prefHeight="26.0" prefWidth="146.0" style="-fx-background-color: darkred;" text="Fail Human Task" textFill="WHITE" visible="false" />
+                              <Label layoutX="14.0" layoutY="23.0" text="Active Emergency plans" />
+                        <TabPane layoutX="5.0" layoutY="418.0" prefHeight="238.0" prefWidth="822.0" tabClosingPolicy="UNAVAILABLE">
+                          <tabs>
+                            <Tab text="Process Diagram">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <HBox>
+                                             <children>
+                                                <VBox prefHeight="200.0" prefWidth="100.0" spacing="3.0">
+                                                   <children>
+                                                      <Label style="-fx-font-weight: bold;" text="Key:">
+                                                         <font>
+                                                            <Font size="14.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Label maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="-Infinity" style="-fx-border-color: black; -fx-background-color: white;" text="Task" />
+                                                      <Label maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="-Infinity" style="-fx-border-color: black; -fx-background-color: #BFFFBF;" text="Completed User task" />
+                                                      <Label maxWidth="1.7976931348623157E308" minHeight="30.0" style="-fx-border-color: black; -fx-background-color: #FFFFBF;" text="Pending User task" />
+                                                      <Label maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="-Infinity" style="-fx-border-color: black; -fx-background-color: #BFBFFF;" text="Completed Service task">
+                                                         <VBox.margin>
+                                                            <Insets />
+                                                         </VBox.margin>
+                                                      </Label>
+                                                      <Label maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="-Infinity" style="-fx-border-color: black; -fx-background-color: #FF7F7F;" text="Failed task" />
+                                                   </children>
+                                                </VBox>
+                                                <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="223.0" prefWidth="814.0">
+                                                  <content>
+                                                    <AnchorPane>
+                                                         <children>
+                                                            <ImageView fx:id="processImageView" fitHeight="800.0" fitWidth="1500.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                               <viewport>
+                                                                  <Rectangle2D />
+                                                               </viewport>
+                                                            </ImageView>
+                                                         </children>
+                                                      </AnchorPane>
+                                                  </content>
+                                                </ScrollPane>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </Tab>
+                            <Tab text="Fail Service task">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <ListView fx:id="serviceTaskListView" layoutX="14.0" layoutY="39.0" prefHeight="122.0" prefWidth="798.0" />
+                                          <Label layoutX="14.0" layoutY="14.0" text="Available services" />
+                                          <Button fx:id="submitServiceTaskFailureButton" layoutX="676.0" layoutY="167.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#submitServiceTaskFailureButtonClick" style="-fx-background-color: darkred;" text="Submit failure request" textFill="WHITE" />
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </Tab>
+                              <Tab disable="true" text="Process Status">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <ListView fx:id="processStatusListView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </Tab>
+                          </tabs>
+                        </TabPane>
+                        <ListView fx:id="activePlansListView" layoutX="156.0" layoutY="23.0" prefHeight="140.0" prefWidth="669.0" />
+                        <ListView fx:id="activeTasksListView" layoutX="154.0" layoutY="289.0" prefHeight="71.0" prefWidth="672.0" />
+                        <Button layoutX="584.0" layoutY="378.0" mnemonicParsing="false" onAction="#updateProcessListButtonClick" text="Update Views" />
+                        <Button layoutX="13.0" layoutY="135.0" mnemonicParsing="false" onAction="#onRemoveProcessInstanceButtonClick" prefHeight="28.0" prefWidth="134.0" style="-fx-background-color: darkred;" text="Remove active plan" textAlignment="CENTER" textFill="WHITE" wrapText="true" />
+                        <Label disable="true" layoutX="154.0" layoutY="370.0" text="Pending messages for selected task" visible="false" />
+                        <TextField fx:id="pendingMessagesCountTextField" disable="true" editable="false" layoutX="360.0" layoutY="366.0" prefHeight="26.0" prefWidth="48.0" visible="false" />
+                        <ListView fx:id="completePlansListView" layoutX="156.0" layoutY="183.0" prefHeight="92.0" prefWidth="669.0" />
+                        <Label layoutX="12.0" layoutY="183.0" prefHeight="40.0" prefWidth="136.0" text="Completed Emergency plans" wrapText="true" />
+                          </children>
+                      </AnchorPane>
+                  </content>
+              </Tab>
+            <Tab text="Flowable">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Accordion layoutX="81.0" layoutY="53.0" prefHeight="421.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <panes>
+                            <TitledPane animated="false" text="Process definitions">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="512.0" prefWidth="848.0">
+                                       <children>
+                                          <VBox layoutX="100.0" layoutY="175.0" prefHeight="395.0" prefWidth="664.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <TableView fx:id="processDefTableView" VBox.vgrow="ALWAYS">
+                                                  <columns>
+                                                    <TableColumn fx:id="processDef_IDColumn" prefWidth="75.0" text="id" />
+                                                    <TableColumn fx:id="processDef_RevColumn" prefWidth="75.0" text="rev" />
+                                                      <TableColumn fx:id="processDef_Name" prefWidth="75.0" text="name" />
+                                                      <TableColumn fx:id="processDef_Key" prefWidth="75.0" text="key" />
+                                                      <TableColumn fx:id="processDef_Version" prefWidth="75.0" text="version" />
+                                                      <TableColumn fx:id="processDef_DeploymentID" prefWidth="75.0" text="deployment ID" />
+                                                      <TableColumn fx:id="processDef_TenantID" prefWidth="75.0" text="tenant id" />
+                                                  </columns>
+                                                </TableView>
+                                                <Separator prefWidth="200.0" />
+                                                <Button fx:id="processDefUpdateButton" mnemonicParsing="false" onAction="#processDefUpdateButtonClick" text="Update" VBox.vgrow="NEVER" />
+                                             </children>
+                                          </VBox>
+                                       </children></AnchorPane>
+                              </content>
+                            </TitledPane>
+                            <TitledPane animated="false" text="[Historic] Process instances">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <VBox layoutX="343.0" layoutY="265.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <TableView fx:id="processInstanceHITableView" prefWidth="462.0" VBox.vgrow="ALWAYS">
+                                                  <columns>
+                                                    <TableColumn fx:id="processInstHi_idColumn" prefWidth="75.0" text="id" />
+                                                    <TableColumn fx:id="processInstHi_revColumn" prefWidth="75.0" text="rev" />
+                                                      <TableColumn fx:id="processInstHi_proc_inst_idColumn" prefWidth="75.0" text="Proc Instance ID" />
+                                                      <TableColumn fx:id="processInstHi_proc_def_idColumn" prefWidth="75.0" text="Proc Def ID" />
+                                                      <TableColumn fx:id="processInstHi_start_timeColumn" prefWidth="75.0" text="Start time" />
+                                                      <TableColumn fx:id="processInstHi_end_timeColumn" prefWidth="75.0" text="End time" />
+                                                      <TableColumn fx:id="processInstHi_durationColumn" prefWidth="75.0" text="Duration" />
+                                                      <TableColumn fx:id="processInstHi_start_user_idColumn" prefWidth="75.0" text="Start User ID" />
+                                                      <TableColumn fx:id="processInstHi_start_act_idColumn" prefWidth="75.0" text="Start activity ID" />
+                                                      <TableColumn fx:id="processInstHi_end_act_idColumn" prefWidth="75.0" text="End activity ID" />
+                                                      <TableColumn fx:id="processInstHi_delete_reasonColumn" prefWidth="75.0" text="Delete reason" />
+                                                  </columns>
+                                                </TableView>
+                                                <Separator prefWidth="200.0" />
+                                                <Button fx:id="processInstanceHIButton" mnemonicParsing="false" onAction="#processInstanceHIButtonClick" text="Update" VBox.vgrow="NEVER" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </TitledPane>
+                            <TitledPane animated="false" text="[Historic] Tasks">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <VBox layoutX="229.0" layoutY="84.0" prefHeight="370.0" prefWidth="491.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <TableView fx:id="taskInstanceHITableView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                                  <columns>
+                                                      <TableColumn fx:id="taskInstHi_idColumn" prefWidth="75.0" text="ID" />
+                                                      <TableColumn fx:id="taskInstHi_revColumn" prefWidth="75.0" text="Revision" />
+                                                      <TableColumn fx:id="taskInstHi_proc_def_idColumn" prefWidth="75.0" text="Process Def ID" />
+                                                      <TableColumn fx:id="taskInstHi_task_def_keyColumn" prefWidth="75.0" text="Task Def ID" />
+                                                    <TableColumn fx:id="taskInstHi_proc_inst_idColumn" prefWidth="75.0" text="Process Inst ID" />
+                                                    <TableColumn fx:id="taskInstHi_nameColumn" prefWidth="75.0" text="name" />
+                                                      <TableColumn fx:id="taskInstHi_start_timeColumn" prefWidth="75.0" text="start time" />
+                                                      <TableColumn fx:id="taskInstHi_end_timeColumn" prefWidth="75.0" text="end time" />
+                                                      <TableColumn fx:id="taskInstHi_durationColumn" prefWidth="75.0" text="duration" />
+                                                      <TableColumn fx:id="taskInstHi_delete_reasonColumn" prefWidth="75.0" text="delete reason" />
+                                                      <TableColumn fx:id="taskInstHi_priorityColumn" prefWidth="75.0" text="priority" />
+                                                      <TableColumn fx:id="taskInstHi_last_updated_timeColumn" prefWidth="75.0" text="last update time" />
+                                                  </columns>
+                                                </TableView>
+                                                <Separator prefWidth="200.0" />
+                                                <Button fx:id="taskInstanceHIButton" mnemonicParsing="false" onAction="#taskInstanceHIButtonClick" text="Update" VBox.vgrow="NEVER" />
+                                             </children>
+                                          </VBox>
+                                       </children></AnchorPane>
+                              </content>
+                            </TitledPane>
+                              <TitledPane prefHeight="200.0" prefWidth="200.0" text="[Historic] Activities">
+                                 <content>
+                                    <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                       <children>
+                                          <VBox layoutX="3.0" layoutY="10.0" prefHeight="332.0" prefWidth="517.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <TableView fx:id="actInstanceHITableView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                                  <columns>
+                                                      <TableColumn fx:id="actInstHi_idColumn" prefWidth="75.0" text="ID" />
+                                                      <TableColumn fx:id="actInstHi_revColumn" prefWidth="75.0" text="Revision" />
+                                                    <TableColumn fx:id="actInstHi_proc_def_idColumn" prefWidth="75.0" text="Process Def ID" />
+                                                    <TableColumn fx:id="actInstHi_act_idColumn" prefWidth="75.0" text="Activity ID" />
+                                                      <TableColumn fx:id="actInstHi_act_nameColumn" prefWidth="75.0" text="Activity name" />
+                                                      <TableColumn fx:id="actInstHi_act_typeColumn" prefWidth="75.0" text="Type" />
+                                                      <TableColumn fx:id="actInstHi_start_timeColumn" prefWidth="75.0" text="Start time" />
+                                                      <TableColumn fx:id="actInstHi_end_timeColumn" prefWidth="75.0" text="End time" />
+                                                      <TableColumn fx:id="actInstHi_durationColumn" prefWidth="75.0" text="Duration" />
+                                                      <TableColumn fx:id="actInstHi_delete_reasonColumn" prefWidth="75.0" text="Delete reason" />
+                                                  </columns>
+                                                </TableView>
+                                                <Separator prefWidth="200.0" />
+                                                <Button fx:id="actInstanceHIButton" mnemonicParsing="false" onAction="#actInstanceHIButtonClick" text="Update" />
+                                             </children>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </TitledPane>
+                          </panes>
+                        </Accordion>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+          </tabs>
+      </TabPane>
+      <AnchorPane prefHeight="84.0" prefWidth="850.0">
+         <children>
+            <ImageView fx:id="nettunitImageView" fitHeight="150.0" fitWidth="850.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <image>
+                  <Image url="@/nettunit.png" />
+               </image></ImageView>
+            <Label layoutX="14.0" layoutY="7.0" text="Projet NETTUNIT">
+               <font>
+                  <Font size="23.0" />
+               </font>
+            </Label>
+            <Label layoutX="14.0" layoutY="35.0" text="Developpé par Davide Andrea Guastella (ICAR-CNR)">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <Label layoutX="192.0" layoutY="7.0" text="Demonstrateur ICAR-IES">
+               <font>
+                  <Font size="23.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+   </children>
+</VBox>
