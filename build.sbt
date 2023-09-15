@@ -16,8 +16,6 @@ assemblyMergeStrategy in assembly := {
 
 Compile / resourceDirectory := (Compile / scalaSource).value
 libraryDependencies ++= Seq(
-  //"org.scalafx" %% "scalafx" % "18.0.1-R28",
-  //"org.scalafx" %% "scalafxml-core-sfx8" % "0.5",
   "org.scalafx" % "scalafx_2.12" % "20.0.0-R31",
   "org.scalafx" % "scalafxml-core-sfx8_2.12" % "0.5",
   // https://mvnrepository.com/artifact/org.scalaj/scalaj-http

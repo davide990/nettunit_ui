@@ -87,6 +87,8 @@
                            </children>
                         </HBox>
                         <Label layoutX="526.0" layoutY="536.0" prefHeight="17.0" prefWidth="64.0" text="XML tags" />
+                        <TextField fx:id="process_name_textfield" layoutX="98.0" layoutY="546.0" prefHeight="26.0" prefWidth="247.0" />
+                        <Label layoutX="14.0" layoutY="554.0" text="Process name" />
                      </children>
                   </AnchorPane>
               </content>

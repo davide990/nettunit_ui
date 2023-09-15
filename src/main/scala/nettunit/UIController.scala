@@ -102,7 +102,8 @@ class UIController(private val completePlansListView: ListView[ProcessInstanceDe
                    private val operatorNameField: TextField,
                    private val flowableAddressTextField: TextField,
                    private val flowablePortTextField: TextField,
-                   private val planIDField: TextField) {
+                   private val planIDField: TextField,
+                   private val process_name_textfield: TextField) {
 
   //necessary for parsing json
   implicit val formats = DefaultFormats
@@ -332,9 +333,9 @@ class UIController(private val completePlansListView: ListView[ProcessInstanceDe
     val connectionString = s"http://${getMUSAAddress()}:${getMUSAAddressPort()}/Goal2BPMN"
     val resultApply = Http(connectionString)
       .header("Content-Type", "text/plain")
-      .postData(goals)
+      .postData(List(process_name_textfield.getText,":",goals).mkString)
       .asString
-
+    //.postData(goals)
     flowableReadyBPMNString = resultApply.body
     eclipseBPMNEditorReadyBPMNString = resultApply.body
     eclipseBPMNEditorReadyBPMNString = eclipseBPMNEditorReadyBPMNString.replace("flowable:executionListener", "activiti:executionListener")
