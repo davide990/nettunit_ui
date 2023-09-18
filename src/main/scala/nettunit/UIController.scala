@@ -103,7 +103,26 @@ class UIController(private val completePlansListView: ListView[ProcessInstanceDe
                    private val flowableAddressTextField: TextField,
                    private val flowablePortTextField: TextField,
                    private val planIDField: TextField,
-                   private val process_name_textfield: TextField) {
+                   private val process_name_textfield: TextField,
+
+                   updateCommTypeResultCodeTextField: TextField,
+                   updateEvtTypologyResultCodeTextField: TextField,
+                   updateEvtSeverityResultCodeTextField: TextField,
+                   updateUrgencyLevelResultCode: TextField,
+                   updateEvtDescResultCode: TextField,
+                   actorsIDListTextField: TextField,
+                   addRecipientResultCodeTextField: TextField,
+                   updateEvtDescTextField: TextField,
+                   updateUrgencyLevelComboBox: ComboBox[String],
+                   eventSeverityComboBox: ComboBox[String],
+                   updateEventTypologyComboBox: ComboBox[String],
+                   updateCommTypeComboBox: ComboBox[String],
+                   sendAddRecipientAckButton: Button,
+                   updateEvtDescSendAckButton: Button,
+                   updateUrgencyLevelSendAckButton: Button,
+                   updateEvtSeverityAckButton: Button,
+                   sendEventTypologyAckButton: Button,
+                   sendCommTypeAckButton: Button) {
 
   //necessary for parsing json
   implicit val formats = DefaultFormats
@@ -333,7 +352,7 @@ class UIController(private val completePlansListView: ListView[ProcessInstanceDe
     val connectionString = s"http://${getMUSAAddress()}:${getMUSAAddressPort()}/Goal2BPMN"
     val resultApply = Http(connectionString)
       .header("Content-Type", "text/plain")
-      .postData(List(process_name_textfield.getText,":",goals).mkString)
+      .postData(List(process_name_textfield.getText, ":", goals).mkString)
       .asString
     //.postData(goals)
     flowableReadyBPMNString = resultApply.body
@@ -369,7 +388,8 @@ class UIController(private val completePlansListView: ListView[ProcessInstanceDe
     val connectionString = s"http://${getMUSAAddress()}:${getMUSAAddressPort()}/Deploy"
     val resultApply = Http(connectionString)
       .header("Content-Type", "text/xml")
-      .postData(BPMNTextArea.getText)
+      //.postData(BPMNTextArea.getText)
+      .postData(List(process_name_textfield.getText, ":", BPMNTextArea.getText).mkString)
       .asString
     new Alert(AlertType.Information, s"Result: $resultApply.statusLine").showAndWait()
   }

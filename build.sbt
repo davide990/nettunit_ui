@@ -23,7 +23,8 @@ libraryDependencies ++= Seq(
   "net.liftweb" %% "lift-json" % "3.0.1",
   "musajixelinterface" %% "musajixelinterface" % "0.1.0-SNAPSHOT",
   // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
-  "org.apache.logging.log4j" % "log4j-core" % "2.19.0"
+  "org.apache.logging.log4j" % "log4j-core" % "2.19.0",
+  "com.beachape" %% "enumeratum" % "1.7.2"
 
 )
 

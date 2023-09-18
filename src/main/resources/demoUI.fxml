@@ -4,6 +4,7 @@
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.RadioButton?>
@@ -93,11 +94,11 @@
                   </AnchorPane>
               </content>
             </Tab>
-              <Tab text="Apply emergency plan">
+              <Tab disable="true" text="Flowable Configuration">
                   <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                           <children>
-                              <Button fx:id="applyIncidentButton" layoutX="170.0" layoutY="292.0" mnemonicParsing="false" onAction="#applyEmergencyPlan" prefHeight="40.0" prefWidth="206.0" text="New Emergency Plan" />
+                              <Button fx:id="applyIncidentButton" layoutX="170.0" layoutY="292.0" mnemonicParsing="false" onAction="#applyEmergencyPlan" prefHeight="40.0" prefWidth="206.0" text="New Emergency Plan" visible="false" />
                         <GridPane layoutX="38.0" layoutY="25.0" prefHeight="261.0" prefWidth="338.0">
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="161.0" minWidth="10.0" prefWidth="103.0" />
@@ -106,6 +107,7 @@
                           <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -115,16 +117,16 @@
                               <Label text="Flowable port" GridPane.rowIndex="1" />
                               <TextField fx:id="flowableAddressTextField" promptText="localhost" GridPane.columnIndex="1" />
                               <TextField fx:id="flowablePortTextField" promptText="8080" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <Label text="Emergency ID" GridPane.rowIndex="2" />
-                                    <TextField fx:id="planIDField" text="NETTUNITProcess" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                    <Label text="Operator" GridPane.rowIndex="3" />
-                                    <TextField fx:id="operatorNameField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                    <Label text="Emergency type" GridPane.rowIndex="4" />
-                                    <TextField fx:id="emergencyTypeField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <Label text="Emergency ID" visible="false" GridPane.rowIndex="3" />
+                                    <TextField fx:id="planIDField" text="NETTUNITProcess" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <Label text="Operator" visible="false" GridPane.rowIndex="4" />
+                                    <TextField fx:id="operatorNameField" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <Label text="Emergency type" visible="false" GridPane.rowIndex="5" />
+                                    <TextField fx:id="emergencyTypeField" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                            </children>
                         </GridPane>
-                        <Button fx:id="sendJixelEventButton" defaultButton="true" layoutX="171.0" layoutY="380.0" mnemonicParsing="false" onAction="#onSendJixelEventButtonClick" prefHeight="40.0" prefWidth="205.0" text="Send JIXEL event to MUSA" />
-                        <Separator layoutX="56.0" layoutY="349.0" prefHeight="17.0" prefWidth="318.0" />
+                        <Button fx:id="sendJixelEventButton" defaultButton="true" layoutX="171.0" layoutY="380.0" mnemonicParsing="false" onAction="#onSendJixelEventButtonClick" prefHeight="40.0" prefWidth="205.0" text="Send JIXEL event to MUSA" visible="false" />
+                        <Separator layoutX="56.0" layoutY="349.0" prefHeight="17.0" prefWidth="318.0" visible="false" />
                         <ImageView fx:id="jixelImageView" fitHeight="42.0" fitWidth="69.0" layoutX="89.0" layoutY="381.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@/jixel.png" />
@@ -343,6 +345,161 @@
                               </TitledPane>
                           </panes>
                         </Accordion>
+                     </children>
+                  </AnchorPane>
+              </content>
+            </Tab>
+            <Tab text="Task Completion">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TabPane layoutX="14.0" layoutY="14.0" prefHeight="631.0" prefWidth="824.0" tabClosingPolicy="UNAVAILABLE">
+                          <tabs>
+                            <Tab text="addRecipient">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <Label layoutX="25.0" layoutY="39.0" text="actors ID" />
+                                          <TextField fx:id="actorsIDListTextField" layoutX="98.0" layoutY="35.0" />
+                                          <Button fx:id="sendAddRecipientAckButton" layoutX="179.0" layoutY="114.0" mnemonicParsing="false" text="Send Ack" />
+                                          <Label layoutX="25.0" layoutY="76.0" text="result code" />
+                                          <TextField fx:id="addRecipientResultCodeTextFieldaddRecipientResultCodeTextField" layoutX="98.0" layoutY="72.0" />
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </Tab>
+                            <Tab text="updateEventDescription">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <GridPane layoutX="21.0" layoutY="14.0" prefHeight="138.0" prefWidth="309.0">
+                                            <columnConstraints>
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                             <children>
+                                                <Button fx:id="updateEvtDescSendAckButton" mnemonicParsing="false" text="Send Ack" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="result code" />
+                                                <Label text="description" GridPane.rowIndex="1" />
+                                                <TextField fx:id="updateEvtDescResultCode" GridPane.columnIndex="1" />
+                                                <TextField fx:id="updateEvtDescTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                             </children>
+                                          </GridPane>
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </Tab>
+                              <Tab text="updateUrgencyLevel">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <GridPane layoutX="37.0" layoutY="42.0" prefHeight="138.0" prefWidth="309.0">
+                                             <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                             </columnConstraints>
+                                             <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                             </rowConstraints>
+                                             <children>
+                                                <Button fx:id="updateUrgencyLevelSendAckButton" mnemonicParsing="false" text="Send Ack" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="result code" />
+                                                <Label text="level" GridPane.rowIndex="1" />
+                                                <TextField fx:id="updateUrgencyLevelResultCode" GridPane.columnIndex="1" />
+                                                <ComboBox fx:id="updateUrgencyLevelComboBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                             </children>
+                                          </GridPane>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </Tab>
+                              <Tab text="updateEventSeverity">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <GridPane layoutX="53.0" layoutY="69.0" prefHeight="138.0" prefWidth="309.0">
+                                             <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                             </columnConstraints>
+                                             <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                             </rowConstraints>
+                                             <children>
+                                                <Button fx:id="updateEvtSeverityAckButton" mnemonicParsing="false" text="Send Ack" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="result code" />
+                                                <Label text="severity" GridPane.rowIndex="1" />
+                                                <TextField fx:id="updateEvtSeverityResultCodeTextField" GridPane.columnIndex="1" />
+                                                <ComboBox fx:id="eventSeverityComboBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                             </children>
+                                          </GridPane>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </Tab>
+                              <Tab text="updateEventTypology">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <GridPane layoutX="38.0" layoutY="65.0" prefHeight="138.0" prefWidth="309.0">
+                                             <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                             </columnConstraints>
+                                             <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                             </rowConstraints>
+                                             <children>
+                                                <Button fx:id="sendEventTypologyAckButton" mnemonicParsing="false" text="Send Ack" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="result code" />
+                                                <Label text="typology" GridPane.rowIndex="1" />
+                                                <TextField fx:id="updateEvtTypologyResultCodeTextField" GridPane.columnIndex="1" />
+                                                <ComboBox fx:id="updateEventTypologyComboBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                             </children>
+                                          </GridPane>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </Tab>
+                              <Tab text="updateCommType">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <GridPane layoutX="30.0" layoutY="42.0" prefHeight="138.0" prefWidth="309.0">
+                                             <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                             </columnConstraints>
+                                             <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                             </rowConstraints>
+                                             <children>
+                                                <Button fx:id="sendCommTypeAckButton" mnemonicParsing="false" text="Send Ack" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="result code" />
+                                                <Label text="communication type" GridPane.rowIndex="1" />
+                                                <TextField fx:id="updateCommTypeResultCodeTextField" GridPane.columnIndex="1" />
+                                                <ComboBox fx:id="updateCommTypeComboBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                             </children>
+                                          </GridPane>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </Tab>
+                          </tabs>
+                        </TabPane>
                      </children>
                   </AnchorPane>
               </content>
